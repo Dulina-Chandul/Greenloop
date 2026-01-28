@@ -8,6 +8,7 @@ import { JWT_REFRESH_SECRET, JWT_SECRET } from "../constants/env";
 import appAssert from "../utils/appAssert";
 import { CONFLICT, UNAUTHORIZED } from "../constants/http";
 import AppErrorCode from "../constants/appErrorCode";
+import { refreshTokenSignOptions, signToken } from "../utils/jwt";
 
 type createAccountParams = {
   email: string;
@@ -29,38 +30,29 @@ export const createAccount = async (data: createAccountParams) => {
   //* Create User
   const user = await UserModel.create(data);
 
+  const userID = user._id;
+
   //* Create Verification Code
   const verificationCode = await VerificationCodeModel.create({
-    userId: user._id,
+    userId: userID,
     type: VerificationCodeType.EmailVerification,
     expiresAt: oneYearFromNow(),
   });
 
   const session = await SessionModel.create({
-    userId: user._id,
+    userId: userID,
     ...(data.userAgent && { userAgent: data.userAgent }),
   });
 
-  const refreshToken = jwt.sign(
+  const refreshToken = signToken(
     { sessionId: session._id },
-    JWT_REFRESH_SECRET,
-    {
-      expiresIn: "30d",
-      audience: ["user"],
-    },
+    refreshTokenSignOptions,
   );
 
-  const accessToken = jwt.sign(
-    {
-      userId: user._id,
-      sessionId: session._id,
-    },
-    JWT_SECRET,
-    {
-      expiresIn: "15m",
-      audience: ["user"],
-    },
-  );
+  const accessToken = signToken({
+    userId: userID,
+    sessionId: session._id,
+  });
 
   return {
     user: user.omitPassword(),
@@ -87,27 +79,16 @@ export const loginUser = async (data: loginParams) => {
   });
 
   //* Create Refresh Token
-  const refreshToken = jwt.sign(
+  const refreshToken = signToken(
     { sessionId: session._id },
-    JWT_REFRESH_SECRET,
-    {
-      expiresIn: "30d",
-      audience: ["user"],
-    },
+    refreshTokenSignOptions,
   );
 
   //* Create Access Token
-  const accessToken = jwt.sign(
-    {
-      userId: user._id,
-      sessionId: session._id,
-    },
-    JWT_SECRET,
-    {
-      expiresIn: "15m",
-      audience: ["user"],
-    },
-  );
+  const accessToken = signToken({
+    userId: user._id,
+    sessionId: session._id,
+  });
 
   return {
     user: user.omitPassword(),
