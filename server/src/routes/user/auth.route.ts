@@ -4,6 +4,7 @@ import {
   logoutHandler,
   refreshHandler,
   registerHandler,
+  resetPasswordHandler,
   sendPasswordResetHandler,
   verifyEmailHandler,
 } from "../../controllers/user/auth.controller";
@@ -27,5 +28,8 @@ authRouter.get("/email/verify/:code", verifyEmailHandler);
 
 //* Forgot Password Handler
 authRouter.post("/password/forgot", sendPasswordResetHandler);
+
+//* Reset Password Handler
+authRouter.post("/password/reset", resetPasswordHandler);
 
 export default authRouter;
