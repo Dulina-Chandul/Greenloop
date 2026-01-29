@@ -7,6 +7,10 @@ import cookieParser from "cookie-parser";
 import errorHandler from "./middleware/errorHandler";
 import catchErrors from "./utils/catchErrors";
 import { OK } from "./constants/http";
+import authRouter from "./routes/user/auth.route";
+import authenticate from "./middleware/Auth/authenticate";
+import userRoutes from "./routes/user/user.route";
+import sessionRoutes from "./routes/user/session.route";
 
 const app = express();
 
@@ -29,6 +33,13 @@ app.get(
     res.status(OK).json({ message: "OK" });
   }),
 );
+
+//* Auth Routes
+app.use("/auth", authRouter);
+
+//* Protected Routes
+app.use("/user", authenticate, userRoutes);
+app.use("/sessions", authenticate, sessionRoutes);
 
 app.use(errorHandler);
 
