@@ -4,7 +4,9 @@ import SessionModel from "../models/session/session.model";
 import UserModel from "../models/user/user.model";
 import VerificationCodeModel from "../models/verification/verification.model";
 import {
+  fiveMinutesAgo,
   ONE_DAY_IN_MS,
+  oneHourFromNow,
   oneYearFromNow,
   thirtyDaysFromNow,
 } from "../utils/date";
@@ -14,6 +16,7 @@ import {
   CONFLICT,
   INTERNAL_SERVER_ERROR,
   NOT_FOUND,
+  TOO_MANY_REQUESTS,
   UNAUTHORIZED,
 } from "../constants/http";
 import AppErrorCode from "../constants/appErrorCode";
@@ -25,7 +28,10 @@ import {
 } from "../utils/jwt";
 import { NOTFOUND } from "node:dns";
 import { sendMail } from "../utils/sendMail";
-import { getVerifyEmailTemplate } from "../utils/emailTemplates";
+import {
+  getPasswordResetTemplate,
+  getVerifyEmailTemplate,
+} from "../utils/emailTemplates";
 
 type createAccountParams = {
   email: string;
@@ -186,5 +192,54 @@ export const verifyUserEmail = async (verificationCode: string) => {
 
   return {
     user: updatedUser.omitPassword(),
+  };
+};
+
+export const sendPasswordResetEmail = async (email: string) => {
+  //* get the user by email
+  const user = await UserModel.findOne({ email });
+  appAssert(user, NOT_FOUND, "User not found");
+
+  //* check email rate limit
+  const fiveMinAgo = fiveMinutesAgo();
+
+  const count = await VerificationCodeModel.countDocuments({
+    userId: user._id,
+    type: VerificationCodeType.PasswordReset,
+    createdAt: { $gt: fiveMinAgo },
+  });
+
+  appAssert(
+    count <= 1,
+    TOO_MANY_REQUESTS,
+    "Too many requests, please try again later",
+  );
+
+  //* create verification code
+  const expiresAt = oneHourFromNow();
+
+  const verificationCode = await VerificationCodeModel.create({
+    userId: user._id,
+    type: VerificationCodeType.PasswordReset,
+    expiresAt,
+  });
+
+  const url = `${APP_ORIGIN}/password/reset/?code=${verificationCode._id}&exp=${expiresAt.getTime()}`;
+
+  const { data: emailData, error: emailError } = await sendMail({
+    to: user.email,
+    ...getPasswordResetTemplate(url),
+  });
+
+  appAssert(
+    emailData?.id,
+    INTERNAL_SERVER_ERROR,
+    `Failed to send password reset email to ${user.email}, ${emailError?.name} = ${emailError?.message}`,
+  );
+
+  //* return success
+  return {
+    url,
+    emailId: emailData?.id,
   };
 };
