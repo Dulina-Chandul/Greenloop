@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router";
+import { Button } from "./components/ui/button";
 // import './App.css'
 
 function App() {
@@ -11,7 +12,12 @@ function App() {
 }
 
 function Home() {
-  return <h1>Home</h1>;
+  return (
+    <div>
+      <h1 className="text-2xl font-bold text-red-500">Home</h1>
+      <Button>Click me</Button>
+    </div>
+  );
 }
 
 export default App;
