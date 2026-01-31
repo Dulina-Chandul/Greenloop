@@ -6,12 +6,18 @@ import Register from "./pages/seller/Register";
 import VerifyEmail from "./pages/common/VerifyEmail";
 import ForgotPassword from "./pages/common/ForgotPassword";
 import ResetPassword from "./pages/common/ResetPassword";
+import AppContainer from "./pages/common/AppContainer";
+import Profile from "./pages/common/Profile";
+import Settings from "./pages/common/Settings";
 // import './App.css'
 
 function App() {
   return (
     <Routes>
-      <Route index element={<Home />} />
+      <Route path="/dashboard" element={<AppContainer />}>
+        <Route index element={<Profile />} />
+        <Route path="settings" element={<Settings />} />
+      </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/email/verify/:code" element={<VerifyEmail />} />
