@@ -15,6 +15,7 @@ export const getSessionsHandler = catchErrors(async (req, res) => {
       userAgent: 1,
       createdAt: 1,
     },
+    {
       sort: { createdAt: -1 },
     },
   );

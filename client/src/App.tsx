@@ -1,35 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { Routes, Route, useNavigate } from "react-router";
+import { Button } from "./components/ui/button";
+import Login from "./pages/seller/Login";
+import Register from "./pages/seller/Register";
+import VerifyEmail from "./pages/common/VerifyEmail";
+import ForgotPassword from "./pages/common/ForgotPassword";
+import ResetPassword from "./pages/common/ResetPassword";
+import AppContainer from "./pages/common/AppContainer";
+import Profile from "./pages/common/Profile";
+import Settings from "./pages/common/Settings";
+import { setNavigate } from "./lib/navigation";
+// import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const navigate = useNavigate();
+  setNavigate(navigate);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Routes>
+      <Route path="/dashboard" element={<AppContainer />}>
+        <Route index element={<Profile />} />
+        <Route path="settings" element={<Settings />} />
+      </Route>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/email/verify/:code" element={<VerifyEmail />} />
+      <Route path="/password/forgot" element={<ForgotPassword />} />
+      <Route path="/password/reset" element={<ResetPassword />} />
+    </Routes>
+  );
 }
 
-export default App
+function Home() {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold text-red-500">Home</h1>
+      <Button>Click me</Button>
+    </div>
+  );
+}
+
+export default App;
