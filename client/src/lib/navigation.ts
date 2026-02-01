@@ -1,6 +1,6 @@
-let navigate = (...args: any) => {};
+import type { NavigateFunction } from "react-router";
 
-export { navigate };
+export let navigate: NavigateFunction = () => {};
 
 export const setNavigate = (fn: any) => {
   navigate = fn;
