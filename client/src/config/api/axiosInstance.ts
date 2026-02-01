@@ -1,6 +1,11 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import queryClient from "../query-client/queryClient";
 import { navigate } from "@/lib/navigation";
+
+interface apiErrorResponse {
+  errorCode?: string;
+  [key: string]: any;
+}
 
 const options = {
   baseURL: import.meta.env.VITE_API_URL,
@@ -13,15 +18,20 @@ tokenRefreshClient.interceptors.response.use((response) => response.data);
 const axiosInstance = axios.create(options);
 axiosInstance.interceptors.response.use(
   (response) => response.data,
-  async (error) => {
+  async (error: AxiosError<apiErrorResponse>) => {
     const { config, response } = error;
+
+    if (!response) {
+      return Promise.reject(error);
+    }
+
     const { status, data } = response || {};
 
-    if (status === 401 && data?.errorCode === "InvalidAccessToken") {
+    if (status === 401 && data?.errorCode === "InvalidAccessToken" && config) {
       try {
         await tokenRefreshClient.get("/auth/refresh");
-        return tokenRefreshClient(config);
-      } catch (error) {
+        return axiosInstance(config);
+      } catch (refreshError) {
         queryClient.clear();
         if (navigate) {
           navigate("/login", {
@@ -30,6 +40,7 @@ axiosInstance.interceptors.response.use(
             },
           });
         }
+        return Promise.reject({ status: 401, message: "Session Expired!" });
       }
     }
 
