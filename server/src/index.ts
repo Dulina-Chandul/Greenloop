@@ -11,6 +11,8 @@ import authRouter from "./routes/user/auth.route";
 import authenticate from "./middleware/Auth/authenticate";
 import userRoutes from "./routes/user/user.route";
 import sessionRoutes from "./routes/user/session.route";
+import sellerRouter from "./routes/seller/seller.route";
+import collectorRouter from "./routes/collector/collector.route";
 
 const app = express();
 
@@ -35,11 +37,17 @@ app.get(
 );
 
 //* Auth Routes
-app.use("/auth", authRouter);
+app.use("/api/v1/auth", authRouter);
+
+//* Seller Routes
+app.use("/api/v1/seller", sellerRouter);
+
+//* Collector Routes
+app.use("/api/v1/collector", collectorRouter);
 
 //* Protected Routes
-app.use("/user", authenticate, userRoutes);
-app.use("/sessions", authenticate, sessionRoutes);
+app.use("/api/v1/user", authenticate, userRoutes);
+app.use("/api/v1/sessions", authenticate, sessionRoutes);
 
 app.use(errorHandler);
 

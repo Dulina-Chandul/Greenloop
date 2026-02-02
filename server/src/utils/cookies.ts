@@ -3,7 +3,7 @@ import { fifteenMinutesFromNow, thirtyDaysFromNow } from "./date";
 
 const secure = process.env.NODE_ENV !== "development";
 
-export const REFRESH_PATH = "/auth/refresh";
+export const REFRESH_PATH = "/api/v1/auth/refresh";
 
 const defaults: CookieOptions = {
   httpOnly: true,
