@@ -23,7 +23,7 @@ import { refreshTokenSignOptions, signToken } from "../../utils/jwt";
 import { setAuthCookies } from "../../utils/cookies";
 
 const sellerController = {
-  // ============= REGISTER =============
+  //* Seller register
   register: catchErrors(async (req, res) => {
     const request = sellerRegisterSchema.parse(req.body);
     const userAgent = req.headers["user-agent"];
@@ -34,7 +34,6 @@ const sellerController = {
       Object.entries(sellerData).filter(([_, value]) => value !== undefined),
     );
 
-    // Check if seller already exists
     const sellerExist = await SellerModel.exists({
       $or: [
         { email: sellerData.email },
@@ -44,11 +43,9 @@ const sellerController = {
 
     appAssert(!sellerExist, CONFLICT, "Email or Phone number already in use");
 
-    // Create seller
     const seller = await SellerModel.create(cleanSellerData);
     const sellerId = seller._id;
 
-    // Create verification code
     const verificationCode = await VerificationCodeModel.create({
       userId: sellerId,
       type: VerificationCodeType.EmailVerification,
@@ -57,7 +54,7 @@ const sellerController = {
 
     const url = `${APP_ORIGIN}/email/verify/${verificationCode._id}`;
 
-    // Send verification email
+    //TODO : change this service to like nodemailer
     const { data: emailData, error: emailError } = await sendMail({
       to: seller.email,
       ...getVerifyEmailTemplate(url),
@@ -69,23 +66,24 @@ const sellerController = {
       "Failed to send verification email",
     );
 
-    // Create session with role
+    //* Create session for the seller
     const session = await SessionModel.create({
       userId: sellerId,
-      userRole: "seller", // ← UPDATED: Add role
+      userRole: "seller",
       ...(userAgent ? { userAgent } : {}),
     });
 
-    // Create tokens with role
+    //* Create refresh tokens for the seller
     const refreshToken = signToken(
-      { sessionId: session._id },
+      { sessionId: session._id.toString() },
       refreshTokenSignOptions,
     );
 
+    //* Create access token for the seller
     const accessToken = signToken({
       userId: sellerId.toString(),
       sessionId: session._id.toString(),
-      userRole: "seller", // ← UPDATED: Add role
+      userRole: "seller",
     });
 
     return setAuthCookies({ res, accessToken, refreshToken })
@@ -94,17 +92,16 @@ const sellerController = {
         message: "Seller account created successfully",
         data: {
           user: seller.omitPassword(),
-          role: "seller", // ← UPDATED: Return role
+          role: "seller",
         },
       });
   }),
 
-  // ============= LOGIN =============
+  //* Seller login
   login: catchErrors(async (req, res) => {
     const request = sellerLoginSchema.parse(req.body);
     const userAgent = req.headers["user-agent"];
 
-    // Find seller by email or phone number
     const query: any = {};
     if (request.email) query.email = request.email;
     if (request.phoneNumber) query.phoneNumber = request.phoneNumber;
@@ -113,21 +110,18 @@ const sellerController = {
 
     appAssert(seller, UNAUTHORIZED, "Invalid credentials");
 
-    // Verify password
     const isPasswordValid = await seller.comparePassword(request.password);
 
     appAssert(isPasswordValid, UNAUTHORIZED, "Invalid credentials");
 
-    // Create session with role
     const session = await SessionModel.create({
       userId: seller._id,
       userRole: "seller",
       ...(userAgent ? { userAgent } : {}),
     });
 
-    // Create tokens with role
     const refreshToken = signToken(
-      { sessionId: session._id },
+      { sessionId: session._id.toString() },
       refreshTokenSignOptions,
     );
 
