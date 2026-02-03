@@ -6,4 +6,7 @@ const sellerRouter = Router();
 //* Register a seller
 sellerRouter.post("/register", sellerController.register);
 
+//* Login a seller
+sellerRouter.post("/login", sellerController.login);
+
 export default sellerRouter;
