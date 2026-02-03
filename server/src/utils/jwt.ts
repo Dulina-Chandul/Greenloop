@@ -11,7 +11,7 @@ export type RefreshTokenPayload = {
 
 export type AccessTokenPayload = {
   userId: string;
-  sessionId: SessionDocument["_id"]; // check for bugs or use sring later
+  sessionId: string;
   userRole: UserRole;
 };
 
@@ -56,6 +56,9 @@ export const verifyToken = <TPayload extends object = AccessTokenPayload>(
       // ...defaults,
       ...verifyOpts,
     }) as TPayload;
+    console.log(
+      "Payload in JWT Verify " + payload + " Remove this after development",
+    );
     return { payload, error: null };
   } catch (error: any) {
     return {
