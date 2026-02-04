@@ -46,8 +46,8 @@ app.use("/api/v1/seller", sellerRouter);
 app.use("/api/v1/collector", collectorRouter);
 
 //* Protected Routes
-app.use("/api/v1/user", authenticate, userRoutes);
-app.use("/api/v1/sessions", authenticate, sessionRoutes);
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/sessions", sessionRoutes);
 
 app.use(errorHandler);
 

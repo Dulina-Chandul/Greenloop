@@ -1,3 +1,4 @@
+// src/pages/collector/Register.tsx
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router";
@@ -12,17 +13,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useAppDispatch } from "@/redux/hooks/hooks";
-import { sellerRegisterAPI } from "@/apiservices/seller/sellerAPI";
+import { registerCollectorAPI } from "@/apiservices/collector/collectorAPI";
 
-const Register = () => {
+const CollectorRegister = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -32,9 +26,6 @@ const Register = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [accountType, setAccountType] = useState<"household" | "business">(
-    "household",
-  );
 
   const [province, setProvince] = useState("");
   const [district, setDistrict] = useState("");
@@ -55,9 +46,7 @@ const Register = () => {
     phoneNumber &&
     province &&
     district &&
-    city &&
-    (accountType === "household" ||
-      (accountType === "business" && businessName));
+    city;
 
   const {
     mutateAsync: register,
@@ -65,9 +54,9 @@ const Register = () => {
     isError,
     error,
   } = useMutation({
-    mutationKey: ["register-seller"],
+    mutationKey: ["register-collector"],
     mutationFn: () =>
-      sellerRegisterAPI(
+      registerCollectorAPI(
         {
           email,
           password,
@@ -75,7 +64,6 @@ const Register = () => {
           firstName,
           lastName,
           phoneNumber,
-          accountType,
           address: {
             province,
             district,
@@ -83,17 +71,13 @@ const Register = () => {
             postalCode,
             street,
           },
-          ...(accountType === "business" && {
-            businessInfo: {
-              businessName,
-              businessRegistration,
-            },
-          }),
+          ...(businessName && { businessName }),
+          ...(businessRegistration && { businessRegistration }),
         },
         dispatch,
       ),
     onSuccess: () => {
-      navigate("/seller/dashboard", { replace: true });
+      navigate("/collector/dashboard", { replace: true });
     },
   });
 
@@ -105,15 +89,15 @@ const Register = () => {
             GreenLoop
           </h1>
           <p className="mt-2 text-sm text-gray-600">
-            Join the waste management revolution as a Seller
+            Join the waste management revolution as a Collector
           </p>
         </div>
 
         <Card className="border-gray-200 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-xl">Create Seller Account</CardTitle>
+            <CardTitle className="text-xl">Create Collector Account</CardTitle>
             <CardDescription>
-              Fill in your details to start listing your recyclables
+              Fill in your details to start collecting recyclables
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-4">
@@ -179,62 +163,46 @@ const Register = () => {
                   className="focus-visible:ring-green-600"
                 />
               </div>
+            </div>
+
+            {/* Optional Business Info */}
+            <div className="space-y-4 p-4 bg-gray-50 rounded-md">
+              <h4 className="text-sm font-medium text-gray-700">
+                Business Information (Optional)
+              </h4>
 
               <div className="space-y-2">
-                <Label htmlFor="accountType">Account Type</Label>
-                <Select
-                  value={accountType}
-                  onValueChange={(val) =>
-                    setAccountType(val as "household" | "business")
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="household">Household</SelectItem>
-                    <SelectItem value="business">Business</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="businessName">Business Name</Label>
+                <Input
+                  id="businessName"
+                  placeholder="Your collection business name"
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  disabled={isPending}
+                  className="focus-visible:ring-green-600"
+                />
               </div>
 
-              {/* Business Info - only show if business account */}
-              {accountType === "business" && (
-                <div className="space-y-4 p-4 bg-gray-50 rounded-md">
-                  <h4 className="text-sm font-medium text-gray-700">
-                    Business Information
-                  </h4>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="businessName">Business Name *</Label>
-                    <Input
-                      id="businessName"
-                      value={businessName}
-                      onChange={(e) => setBusinessName(e.target.value)}
-                      disabled={isPending}
-                      className="focus-visible:ring-green-600"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="businessRegistration">
-                      Business Registration (Optional)
-                    </Label>
-                    <Input
-                      id="businessRegistration"
-                      value={businessRegistration}
-                      onChange={(e) => setBusinessRegistration(e.target.value)}
-                      disabled={isPending}
-                      className="focus-visible:ring-green-600"
-                    />
-                  </div>
-                </div>
-              )}
+              <div className="space-y-2">
+                <Label htmlFor="businessRegistration">
+                  Business Registration Number
+                </Label>
+                <Input
+                  id="businessRegistration"
+                  placeholder="Registration number"
+                  value={businessRegistration}
+                  onChange={(e) => setBusinessRegistration(e.target.value)}
+                  disabled={isPending}
+                  className="focus-visible:ring-green-600"
+                />
+              </div>
             </div>
 
             {/* Address Information */}
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-gray-900">Address</h3>
+              <h3 className="text-sm font-semibold text-gray-900">
+                Service Area
+              </h3>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -340,7 +308,7 @@ const Register = () => {
               disabled={!isFormValid || isPending}
               onClick={() => register()}
             >
-              {isPending ? "Creating account..." : "Sign up"}
+              {isPending ? "Creating account..." : "Sign up as Collector"}
             </Button>
 
             {/* Login Link */}
@@ -353,6 +321,17 @@ const Register = () => {
                 Sign in
               </Link>
             </div>
+
+            {/* Register as Seller Link */}
+            <div className="text-center text-sm text-gray-500">
+              Want to sell instead?{" "}
+              <Link
+                to="/register/seller"
+                className="font-semibold text-green-600 hover:text-green-500 hover:underline"
+              >
+                Register as Seller
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -360,4 +339,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default CollectorRegister;

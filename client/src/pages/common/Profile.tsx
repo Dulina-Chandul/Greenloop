@@ -15,7 +15,7 @@ const Profile = () => {
   const { user } = userAuth();
   if (!user) return null;
 
-  const { email, verified, createdAt } = user.user;
+  const { email, verified, createdAt } = user;
 
   console.log(user);
 

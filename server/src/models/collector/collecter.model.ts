@@ -42,7 +42,8 @@ export interface CollectorDocument extends mongoose.Document {
   };
   workingDays: string[];
 
-  acceptedMaterials: string[];
+  //TODO : Change this to require
+  acceptedMaterials?: string[];
   specializations?: string[];
 
   rating: {
@@ -220,13 +221,15 @@ const collectorSchema = new mongoose.Schema<CollectorDocument>(
       ],
     },
 
+    //TODO : Add validation to check if he accept at least one "acceptedMaterials"
+
     acceptedMaterials: {
       type: [String],
-      required: true,
-      validate: {
-        validator: (v: string[]) => v.length > 0,
-        message: "At least one material type must be accepted",
-      },
+      required: false,
+      // validate: {
+      //   validator: (v: string[]) => v.length > 0,
+      //   message: "At least one material type must be accepted",
+      // },
     },
     specializations: [String],
 
