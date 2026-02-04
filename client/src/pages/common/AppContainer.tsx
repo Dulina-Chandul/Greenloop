@@ -1,10 +1,14 @@
-import { Navigate, Outlet, useLocation } from "react-router";
+import { Navigate, useLocation } from "react-router";
 import { Loader2 } from "lucide-react";
 
 import userAuth from "@/hooks/userAuth";
 import UserMenu from "./UserMenu";
 
-const AppContainer = () => {
+interface AppContainerProps {
+  children: React.ReactNode;
+}
+
+const AppContainer = ({ children }: AppContainerProps) => {
   const { user, isLoading } = userAuth();
   const location = useLocation();
 
@@ -19,7 +23,7 @@ const AppContainer = () => {
   return user ? (
     <div className="min-h-screen w-full bg-background p-4">
       <UserMenu />
-      <Outlet />
+      {children}
     </div>
   ) : (
     <Navigate

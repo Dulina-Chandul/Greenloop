@@ -14,34 +14,38 @@ import {
 } from "@/components/ui/card";
 
 import { loginAPI } from "@/apiservices/seller/sellerAPI";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import { selectUserRole } from "@/redux/slices/authSlice";
 
 const Login = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const userRole = useAppSelector(selectUserRole);
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const redirectUrl = location.state?.redirectUrl || "/dashboard";
-
   const {
-    mutateAsync: sellerLogin,
+    mutateAsync: login,
     isPending,
     isError,
   } = useMutation({
-    mutationKey: ["login-seller"],
-    mutationFn: loginAPI,
+    mutationKey: ["login"],
+    mutationFn: (data: { email: string; password: string }) =>
+      loginAPI(data, dispatch),
     onSuccess: () => {
-      navigate(redirectUrl, {
-        replace: true,
-      });
+      const rolePath =
+        userRole === "collector" ? "/collector/dashboard" : "/seller/dashboard";
+      const target = location.state?.redirectUrl || rolePath;
+      navigate(target, { replace: true });
+      return;
     },
   });
 
-  //* Handle "Enter" key press
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      sellerLogin({ email, password });
+    if (e.key === "Enter" && email && password.length >= 6) {
+      login({ email, password });
     }
   };
 
@@ -113,7 +117,7 @@ const Login = () => {
             <Button
               className="w-full bg-green-600 hover:bg-green-700 text-white"
               disabled={!email || password.length < 6 || isPending}
-              onClick={() => sellerLogin({ email, password })}
+              onClick={() => login({ email, password })}
             >
               {isPending ? "Signing in..." : "Sign in"}
             </Button>
@@ -122,7 +126,7 @@ const Login = () => {
             <div className="text-center text-sm text-gray-500 mt-4">
               Don&apos;t have an account?{" "}
               <Link
-                to="/register"
+                to="/seller/register"
                 className="font-semibold text-green-600 hover:text-green-500 hover:underline"
               >
                 Sign up

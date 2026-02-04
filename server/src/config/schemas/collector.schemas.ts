@@ -69,9 +69,11 @@ export const collectorRegisterSchema = z
     serviceAreas: z.array(z.string()).optional(),
     vehicleType: z.string().optional(),
     vehicleCapacity: z.number().optional(),
+    //TODO : Add validation to check if he accept at least one "acceptedMaterials"
     acceptedMaterials: z
       .array(z.string())
-      .min(1, "At least one accepted material is required"),
+      .min(1, "At least one accepted material is required")
+      .optional(),
     specializations: z.array(z.string()).optional(),
 
     workingDays: z.array(z.string()).optional(),

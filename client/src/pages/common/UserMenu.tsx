@@ -1,3 +1,4 @@
+// src/pages/common/UserMenu.tsx
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { LogOut, User, Settings } from "lucide-react";
@@ -12,18 +13,34 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { logout } from "@/apiservices/common/commonAPI";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import { selectUser, selectUserRole } from "@/redux/slices/authSlice";
 
 const UserMenu = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  const userRole = useAppSelector(selectUserRole);
 
   const { mutate: signOut } = useMutation({
-    mutationFn: logout,
+    mutationFn: () => logout(dispatch),
     onSettled: () => {
       queryClient.clear();
       navigate("/login", { replace: true });
     },
   });
+
+  const dashboardRoute =
+    userRole === "collector" ? "/collector/dashboard" : "/seller/dashboard";
+
+  const profileRoute =
+    userRole === "collector" ? "/collector/profile" : "/seller/profile";
+
+  const settingsRoute =
+    userRole === "collector" ? "/collector/settings" : "/seller/settings";
+
+  const initials = user?.email?.charAt(0).toUpperCase() || "GL";
 
   return (
     <div className="absolute bottom-6 left-6 z-50">
@@ -33,7 +50,7 @@ const UserMenu = () => {
             <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
               <AvatarImage src="#" alt="User" />
               <AvatarFallback className="bg-green-600 text-white">
-                GL
+                {initials}
               </AvatarFallback>
             </Avatar>
           </div>
@@ -44,7 +61,15 @@ const UserMenu = () => {
           <DropdownMenuSeparator />
 
           <DropdownMenuItem
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate(dashboardRoute)}
+            className="cursor-pointer"
+          >
+            <User className="mr-2 h-4 w-4" />
+            <span>Dashboard</span>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={() => navigate(profileRoute)}
             className="cursor-pointer"
           >
             <User className="mr-2 h-4 w-4" />
@@ -52,7 +77,7 @@ const UserMenu = () => {
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onClick={() => navigate("/dashboard/settings")}
+            onClick={() => navigate(settingsRoute)}
             className="cursor-pointer"
           >
             <Settings className="mr-2 h-4 w-4" />
