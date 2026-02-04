@@ -11,7 +11,7 @@ export interface VerificationCodeDocument extends mongoose.Document {
 const verificationCodeSchema = new mongoose.Schema<VerificationCodeDocument>({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    // ref: ["User", "Seller", "Collector"],
     required: true,
     index: true,
   },

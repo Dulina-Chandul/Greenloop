@@ -4,6 +4,7 @@ import { thirtyDaysFromNow } from "../../utils/date";
 export interface SessionDocument extends mongoose.Document {
   userId: mongoose.Types.ObjectId;
   userAgent?: string;
+  userRole: "user" | "seller" | "collector";
   createdAt: Date;
   expiresAt: Date;
 }
@@ -11,13 +12,19 @@ export interface SessionDocument extends mongoose.Document {
 const sessionSchema = new mongoose.Schema<SessionDocument>({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    // ref: "User",
     required: true,
     index: true,
   },
   userAgent: {
     type: String,
     required: false,
+  },
+  userRole: {
+    type: String,
+    enum: ["user", "seller", "collector"],
+    required: true,
+    index: true,
   },
   createdAt: {
     type: Date,

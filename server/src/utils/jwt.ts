@@ -3,22 +3,25 @@ import { SessionDocument } from "../models/session/session.model";
 import { UserDocument } from "../models/user/user.model";
 import { JWT_REFRESH_SECRET, JWT_SECRET } from "../constants/env";
 
+export type UserRole = "user" | "seller" | "collector";
+
 export type RefreshTokenPayload = {
-  sessionId: SessionDocument["_id"];
+  sessionId: string;
 };
 
 export type AccessTokenPayload = {
-  userId: UserDocument["_id"];
-  sessionId: SessionDocument["_id"];
+  userId: string;
+  sessionId: string;
+  userRole: UserRole;
 };
 
 type SignOptionsAndSecret = SignOptions & {
   secret: string;
 };
 
-const defaults: SignOptions = {
-  audience: ["user"],
-};
+// const defaults: SignOptions = {
+//   audience: ["user"],
+// };
 
 const accessTokenSignOptions: SignOptionsAndSecret = {
   expiresIn: "15m",
@@ -36,7 +39,7 @@ export const signToken = (
 ) => {
   const { secret, ...signOpts } = options || accessTokenSignOptions;
   return jwt.sign(payload, secret, {
-    ...defaults,
+    // ...defaults,
     ...signOpts,
   });
 };
@@ -50,12 +53,16 @@ export const verifyToken = <TPayload extends object = AccessTokenPayload>(
   const { secret = JWT_SECRET, ...verifyOpts } = options || {};
   try {
     const payload = jwt.verify(token, secret, {
-      ...defaults,
+      // ...defaults,
       ...verifyOpts,
-    } as VerifyOptions) as unknown as TPayload;
-    return { payload };
+    }) as TPayload;
+    console.log(
+      "Payload in JWT Verify " + payload + " Remove this after development",
+    );
+    return { payload, error: null };
   } catch (error: any) {
     return {
+      message: error.message,
       error: error.message,
     };
   }
