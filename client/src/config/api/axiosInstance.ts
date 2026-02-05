@@ -27,9 +27,14 @@ axiosInstance.interceptors.response.use(
 
     const { status, data } = response || {};
 
-    if (status === 401 && data?.errorCode === "InvalidAccessToken" && config) {
+    if (
+      status === 401 &&
+      data?.errorCode === "INVALID_ACCESS_TOKEN" &&
+      config
+    ) {
       try {
         await tokenRefreshClient.get("/auth/refresh");
+        console.log(config);
         return axiosInstance(config);
       } catch (refreshError) {
         queryClient.clear();
