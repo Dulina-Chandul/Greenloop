@@ -1,15 +1,15 @@
 import mongoose from "mongoose";
 
 export interface ListingDocument extends mongoose.Document {
-  //* Informations about the seller
+  //* Seller
   sellerId: mongoose.Types.ObjectId;
 
-  //* Basic Informations about the listing
+  //* Basic information about the listing
   title: string;
   description: string;
   category: "plastic" | "metal" | "paper" | "glass" | "electronic" | "mixed";
 
-  //* AI Analysis details from ScrapLens
+  //* AI Analysis from ScrapLens
   aiAnalysis: {
     detectedMaterials: Array<{
       materialType: string;
@@ -23,7 +23,7 @@ export interface ListingDocument extends mongoose.Document {
     modelVersion?: string;
   };
 
-  //* Manual overrides done by the seller
+  //* If user manually edits the listing
   manualOverrides?: {
     weight?: number;
     materials?: string[];
@@ -32,19 +32,20 @@ export interface ListingDocument extends mongoose.Document {
     editedAt?: Date;
   };
 
-  //* Final Values
+  //* Final value (AI + USER)
   finalWeight: number;
   finalMaterials: string[];
   finalValue: number;
 
+  //* Images of the scrape
   images: string[];
   primaryImage: string;
 
-  // Location (GeoJSON)
-  //   location: {
-  //     type: "Point";
-  //     coordinates: number[]; // [longitude, latitude]
-  //   };
+  //* Location
+  location: {
+    type: "Point";
+    coordinates: number[];
+  };
   address: {
     street?: string;
     city: string;
@@ -52,6 +53,7 @@ export interface ListingDocument extends mongoose.Document {
   };
   pickupRadius: number; //KM
 
+  //* Pickup details
   availableFrom: Date;
   availableUntil?: Date;
   preferredPickupTime?: {
@@ -186,17 +188,17 @@ const listingSchema = new mongoose.Schema<ListingDocument>(
       required: true,
     },
 
-    // location: {
-    //   type: {
-    //     type: String,
-    //     enum: ["Point"],
-    //     required: true,
-    //   },
-    //   coordinates: {
-    //     type: [Number],
-    //     required: true,
-    //   },
-    // },
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
     address: {
       street: String,
       city: {
@@ -282,7 +284,7 @@ const listingSchema = new mongoose.Schema<ListingDocument>(
   },
 );
 
-// listingSchema.index({ location: "2dsphere" }); // CRITICAL for location queries
+listingSchema.index({ location: "2dsphere" });
 listingSchema.index({ status: 1, createdAt: -1 });
 listingSchema.index({ sellerId: 1, status: 1 });
 listingSchema.index({ category: 1, status: 1 });
@@ -296,7 +298,8 @@ listingSchema.pre("save", function () {
       this.manualOverrides.materials ||
       this.aiAnalysis.detectedMaterials.map((m) => m.materialType);
 
-    this.finalValue = this.finalWeight * 50; // Base price per kg (can be more sophisticated)
+    //TODO : chage the price calculating process
+    this.finalValue = this.finalWeight * 50;
   } else {
     this.finalWeight = this.aiAnalysis.totalEstimatedWeight;
     this.finalMaterials = this.aiAnalysis.detectedMaterials.map(

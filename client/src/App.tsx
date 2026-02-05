@@ -14,6 +14,10 @@ import CollectorRegister from "./pages/collector/CollectorRegister";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import SellerDashboard from "./pages/seller/SellerDashboard";
 import CollectorDashboard from "./pages/collector/CollectorDashboard";
+import CollectorAuctions from "./pages/collector/CollectorAuctions";
+import CollectorLayout from "./components/layout/CollectorLayout";
+import SellerLayout from "./components/layout/SellerLayout";
+import CreateListing from "./pages/seller/CreateListing";
 // import './App.css'
 
 function App() {
@@ -33,9 +37,19 @@ function App() {
         path="/seller/dashboard"
         element={
           <ProtectedRoute allowedRoles={["seller"]}>
-            <AppContainer>
+            <SellerLayout>
               <SellerDashboard />
-            </AppContainer>
+            </SellerLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/seller/create-listing"
+        element={
+          <ProtectedRoute allowedRoles={["seller"]}>
+            <SellerLayout>
+              <CreateListing />
+            </SellerLayout>
           </ProtectedRoute>
         }
       />
@@ -43,9 +57,9 @@ function App() {
         path="/seller/profile"
         element={
           <ProtectedRoute allowedRoles={["seller"]}>
-            <AppContainer>
+            <SellerLayout>
               <Profile />
-            </AppContainer>
+            </SellerLayout>
           </ProtectedRoute>
         }
       />
@@ -53,9 +67,9 @@ function App() {
         path="/seller/settings"
         element={
           <ProtectedRoute allowedRoles={["seller"]}>
-            <AppContainer>
+            <SellerLayout>
               <Settings />
-            </AppContainer>
+            </SellerLayout>
           </ProtectedRoute>
         }
       />
@@ -64,9 +78,19 @@ function App() {
         path="/collector/dashboard"
         element={
           <ProtectedRoute allowedRoles={["collector"]}>
-            <AppContainer>
+            <CollectorLayout>
               <CollectorDashboard />
-            </AppContainer>
+            </CollectorLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/collector/auctions"
+        element={
+          <ProtectedRoute allowedRoles={["collector"]}>
+            <CollectorLayout>
+              <CollectorAuctions />
+            </CollectorLayout>
           </ProtectedRoute>
         }
       />
@@ -74,9 +98,9 @@ function App() {
         path="/collector/profile"
         element={
           <ProtectedRoute allowedRoles={["collector"]}>
-            <AppContainer>
+            <CollectorLayout>
               <Profile />
-            </AppContainer>
+            </CollectorLayout>
           </ProtectedRoute>
         }
       />
@@ -84,9 +108,9 @@ function App() {
         path="/collector/settings"
         element={
           <ProtectedRoute allowedRoles={["collector"]}>
-            <AppContainer>
+            <CollectorLayout>
               <Settings />
-            </AppContainer>
+            </CollectorLayout>
           </ProtectedRoute>
         }
       />
