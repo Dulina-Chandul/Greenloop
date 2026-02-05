@@ -1,70 +1,78 @@
-// src/pages/seller/Dashboard.tsx
 import { useAppSelector } from "@/redux/hooks/hooks";
 import { selectUser } from "@/redux/slices/authSlice";
+import { Link } from "react-router";
+import { Package, TrendingUp, DollarSign, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const SellerDashboard = () => {
+export default function SellerDashboard() {
   const user = useAppSelector(selectUser);
 
+  const stats = [
+    {
+      label: "Total Listings",
+      value: "0",
+      icon: Package,
+      color: "bg-blue-500",
+    },
+    {
+      label: "Active Listings",
+      value: "0",
+      icon: TrendingUp,
+      color: "bg-green-500",
+    },
+    {
+      label: "Total Earnings",
+      value: "Rs. 0",
+      icon: DollarSign,
+      color: "bg-purple-500",
+    },
+  ];
+
   return (
-    <div className="container mx-auto mt-16 max-w-6xl px-4">
-      <h1 className="mb-6 text-3xl font-bold tracking-tight text-gray-900">
-        Seller Dashboard
-      </h1>
-
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Stats Cards */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
-          <h3 className="text-sm font-medium text-gray-500">Total Listings</h3>
-          <p className="mt-2 text-3xl font-bold text-gray-900">0</p>
-        </div>
-
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
-          <h3 className="text-sm font-medium text-gray-500">Active Listings</h3>
-          <p className="mt-2 text-3xl font-bold text-green-600">0</p>
-        </div>
-
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
-          <h3 className="text-sm font-medium text-gray-500">Total Earnings</h3>
-          <p className="mt-2 text-3xl font-bold text-gray-900">Rs. 0</p>
-        </div>
-      </div>
-
-      {/* Welcome Message */}
-      <div className="mt-8 rounded-lg border bg-white p-8 shadow-sm">
-        <h2 className="text-2xl font-bold text-gray-900">
-          Welcome, {user?.firstName || "Seller"}! 👋
-        </h2>
-        <p className="mt-2 text-gray-600">
-          Start creating listings to connect with collectors and sell your
-          recyclables.
-        </p>
-        <button className="mt-4 rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700">
-          Create Your First Listing
-        </button>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Recent Activity
-          </h3>
-          <p className="mt-2 text-sm text-gray-500">
-            No recent activity yet. Create your first listing to get started!
+    <div className="h-full overflow-y-auto bg-gray-900 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Welcome, {user?.firstName || "Seller"}! 👋
+          </h1>
+          <p className="text-gray-400">
+            Start creating listings to connect with collectors
           </p>
         </div>
 
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900">Quick Tips</h3>
-          <ul className="mt-2 space-y-2 text-sm text-gray-600">
-            <li>✓ Add clear photos of your recyclables</li>
-            <li>✓ Set competitive prices</li>
-            <li>✓ Respond quickly to collector bids</li>
-          </ul>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {stats.map((stat, i) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={i}
+                className="bg-gray-800 rounded-lg p-6 border border-gray-700"
+              >
+                <div className={`${stat.color} p-3 rounded-lg w-fit mb-4`}>
+                  <Icon className="text-white" size={24} />
+                </div>
+                <h3 className="text-gray-400 text-sm mb-1">{stat.label}</h3>
+                <p className="text-3xl font-bold text-white">{stat.value}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="bg-gray-800 rounded-lg p-8 border border-gray-700 text-center">
+          <h2 className="text-2xl font-bold text-white mb-2">
+            No listings yet
+          </h2>
+          <p className="text-gray-400 mb-6">
+            Create your first listing to start selling your recyclables
+          </p>
+          <Link to="/seller/create-listing">
+            <Button className="bg-green-600 hover:bg-green-700">
+              <Plus className="mr-2 h-5 w-5" />
+              Create Your First Listing
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
   );
-};
-
-export default SellerDashboard;
+}

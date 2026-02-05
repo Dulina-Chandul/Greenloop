@@ -69,6 +69,7 @@ app.use("/api/v1/seller", sellerRouter);
 
 //* Listing Routes
 app.use("/api/v1/seller/listing", listingRouter);
+app.use("/api/v1/listings", listingRouter);
 
 //* Collector Routes
 app.use("/api/v1/collector", collectorRouter);
@@ -79,7 +80,7 @@ app.use("/api/v1/sessions", sessionRoutes);
 
 app.use(errorHandler);
 
-app.listen(PORT, async () => {
+httpServer.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT} in ${NODE_ENV} environment`);
   await connectToDatabase();
 });

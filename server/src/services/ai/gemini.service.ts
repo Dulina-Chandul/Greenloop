@@ -13,6 +13,7 @@ interface WasteAnalysisResult {
   totalWeight: number;
   totalValue: number;
   category: "plastic" | "metal" | "paper" | "glass" | "electronic" | "mixed";
+  description: string;
 }
 
 export const analyzeWasteImage = async (
@@ -32,7 +33,8 @@ export const analyzeWasteImage = async (
   ],
   "totalWeight": total estimated weight in kg,
   "totalValue": total estimated value in LKR,
-  "category": "plastic" | "metal" | "paper" | "glass" | "electronic" | "mixed"
+  "category": "plastic" | "metal" | "paper" | "glass" | "electronic" | "mixed",
+  "description": "A short, concise description of the waste items (e.g. 'A pile of crushed aluminum cans and clear plastic bottles')"
 }
 
 Pricing reference (LKR per kg):

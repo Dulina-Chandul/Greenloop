@@ -85,10 +85,34 @@ export const listingController = {
         }
       : undefined;
 
+    // Calculate final fields to satisfy model validation
+    let finalWeight: number;
+    let finalMaterials: string[];
+    let finalValue: number;
+
+    if (manualOverrides) {
+      finalWeight =
+        manualOverrides.weight ?? data.aiAnalysis.totalEstimatedWeight;
+      finalMaterials =
+        manualOverrides.materials ??
+        data.aiAnalysis.detectedMaterials.map((m) => m.materialType);
+      // Using logic from model's pre-save hook
+      finalValue = finalWeight * 50;
+    } else {
+      finalWeight = data.aiAnalysis.totalEstimatedWeight;
+      finalMaterials = data.aiAnalysis.detectedMaterials.map(
+        (m) => m.materialType,
+      );
+      finalValue = data.aiAnalysis.totalEstimatedValue;
+    }
+
     const listing = (await ListingModel.create({
       sellerId,
       ...data,
       manualOverrides,
+      finalWeight,
+      finalMaterials,
+      finalValue,
     } as any)) as ListingDocument;
 
     await listing.populate(
@@ -131,6 +155,7 @@ export const listingController = {
           totalEstimatedWeight: aiAnalysis.totalWeight,
           totalEstimatedValue: aiAnalysis.totalValue,
           category: aiAnalysis.category,
+          description: aiAnalysis.description,
           analysisTimestamp: new Date(),
         },
       },
@@ -163,7 +188,6 @@ export const listingController = {
       },
     })
       .populate("sellerId", "firstName lastName rating accountType")
-      .sort({ createdAt: -1 })
       .limit(50);
 
     return res.status(OK).json({
