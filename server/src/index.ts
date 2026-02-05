@@ -13,8 +13,33 @@ import userRoutes from "./routes/user/user.route";
 import sessionRoutes from "./routes/user/session.route";
 import sellerRouter from "./routes/seller/seller.route";
 import collectorRouter from "./routes/collector/collector.route";
+import listingRouter from "./routes/listing/listing.route";
+import { createServer } from "node:http";
+import { Server as SocketIoServer } from "socket.io";
 
 const app = express();
+const httpServer = createServer(app);
+
+export const io = new SocketIoServer(httpServer, {
+  cors: {
+    origin: APP_ORIGIN,
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log(`Collector conntected : ${socket.id}`);
+
+  socket.on("collector:join", (data) => {
+    const { collectorId, location } = data;
+    socket.join(`collector:${collectorId}`);
+    console.log(`Collector ${collectorId} joined with location : ${location}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`Collector disconnected : ${socket.id}`);
+  });
+});
 
 const corsOptions = {
   origin: APP_ORIGIN,
@@ -41,6 +66,9 @@ app.use("/api/v1/auth", authRouter);
 
 //* Seller Routes
 app.use("/api/v1/seller", sellerRouter);
+
+//* Listing Routes
+app.use("/api/v1/seller/listing", listingRouter);
 
 //* Collector Routes
 app.use("/api/v1/collector", collectorRouter);
