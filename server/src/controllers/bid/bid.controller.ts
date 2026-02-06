@@ -12,6 +12,7 @@ import CollectorModel from "../../models/collector/collecter.model";
 import appAssert from "../../utils/appAssert";
 import catchErrors from "../../utils/catchErrors";
 import { io } from "../../utils/socket";
+import TransactionModel from "../../models/transaction/transaction.model";
 
 const createBidSchema = z.object({
   listingId: z.string(),
@@ -177,7 +178,11 @@ export const bidController = {
       .populate({
         path: "listingId",
         select:
-          "title primaryImage finalWeight address status currentHighestBid",
+          "title primaryImage finalWeight address status currentHighestBid sellerId",
+        populate: {
+          path: "sellerId",
+          select: "firstName lastName phoneNumber address email",
+        },
       })
       .sort({ createdAt: -1 });
 
@@ -327,6 +332,23 @@ export const bidController = {
     listing.acceptedBuyerId = bid.bidderId;
     listing.closedAt = new Date();
     await listing.save();
+
+    // Create transaction
+    const transaction = await (TransactionModel as any).create({
+      listingId: listing._id,
+      acceptedBidId: bid._id,
+      sellerId: listing.sellerId,
+      buyerId: bid.bidderId,
+      agreedPrice: bid.amount,
+      sellerReceives: bid.amount, // No platform fee for now
+      paymentStatus: "pending",
+      status: "scheduled",
+      scheduledPickupDate:
+        bid.proposedPickupDate || new Date(Date.now() + 24 * 60 * 60 * 1000), // Default to tomorrow if not set
+      scheduledPickupTime: bid.proposedPickupTime || "12:00",
+      sellerConfirmed: false,
+      buyerConfirmed: false,
+    });
 
     // Reject all other pending bids
     await BidModel.updateMany(

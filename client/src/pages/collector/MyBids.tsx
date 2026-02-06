@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { Clock, DollarSign, Package, MapPin } from "lucide-react";
+import { Clock, DollarSign, Package, MapPin, Phone, User } from "lucide-react";
 import axiosInstance from "@/config/api/axiosInstance";
 
 export default function MyBids() {
@@ -14,11 +14,17 @@ export default function MyBids() {
     queryKey: ["my-bids"],
     queryFn: async () => {
       const response = await axiosInstance.get("/bids/my-bids");
-      return response.data.bids;
+      console.log("MyBids API response:", response);
+      // The response from axiosInstance interceptor is the data body: { data: { bids: [...] } }
+      // So we access response.data.bids
+      if (response?.data?.bids) {
+        return response.data.bids;
+      }
+      return [];
     },
   });
 
-  const bids = bidsData || [];
+  const bids = Array.isArray(bidsData) ? bidsData : [];
 
   const filteredBids = bids.filter((bid: any) => {
     if (activeTab === "active")
@@ -168,15 +174,67 @@ export default function MyBids() {
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-gray-700 flex justify-between items-center text-sm">
-                    <span className="text-gray-400">
-                      {new Date(bid.createdAt).toLocaleDateString()}
-                    </span>
-                    {activeTab === "active" && (
-                      <span className="text-green-400 font-medium flex items-center">
-                        <Clock size={14} className="mr-1" />
-                        Active
-                      </span>
+                  <div className="mt-4 pt-3 border-t border-gray-700">
+                    {activeTab === "won" && bid.listingId?.sellerId ? (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-gray-400">
+                            <User size={16} />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-white">
+                              {bid.listingId.sellerId.firstName}{" "}
+                              {bid.listingId.sellerId.lastName}
+                            </p>
+                            <p className="text-xs text-gray-500">Seller</p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-2">
+                          <a
+                            href={`tel:${bid.listingId.sellerId.phoneNumber}`}
+                            className="flex items-center gap-2 text-sm text-gray-300 hover:text-green-400 transition-colors p-2 bg-gray-900/50 rounded"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Phone size={14} />
+                            {bid.listingId.sellerId.phoneNumber}
+                          </a>
+                          <div className="flex items-start gap-2 text-sm text-gray-300 p-2 bg-gray-900/50 rounded">
+                            <MapPin size={14} className="mt-1 shrink-0" />
+                            <span className="break-words">
+                              {bid.listingId.sellerId.address?.street},{" "}
+                              {bid.listingId.sellerId.address?.city}
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(
+                              `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                                `${bid.listingId.address.street}, ${bid.listingId.address.city}, ${bid.listingId.address.district}`,
+                              )}`,
+                              "_blank",
+                            );
+                          }}
+                          className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 rounded transition-colors"
+                        >
+                          Get Directions
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-400">
+                          {new Date(bid.createdAt).toLocaleDateString()}
+                        </span>
+                        {activeTab === "active" && (
+                          <span className="text-green-400 font-medium flex items-center">
+                            <Clock size={14} className="mr-1" />
+                            Active
+                          </span>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>

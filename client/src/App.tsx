@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { Routes, Route, useNavigate } from "react-router";
-import { Button } from "./components/ui/button";
 import Login from "./pages/seller/Login";
 import Register from "./pages/seller/Register";
 import VerifyEmail from "./pages/common/VerifyEmail";
@@ -22,6 +20,7 @@ import AuctionDetails from "./pages/collector/AuctionDetails";
 import MyListings from "./pages/seller/MyListings";
 import ListingBids from "./pages/seller/ListingBids";
 import MyBids from "./pages/collector/MyBids";
+import Earnings from "./pages/common/Earnings";
 // import './App.css'
 
 function App() {
@@ -78,11 +77,41 @@ function App() {
         }
       />
       <Route
+        path="/seller/my-listings"
+        element={
+          <ProtectedRoute allowedRoles={["seller"]}>
+            <SellerLayout>
+              <MyListings />
+            </SellerLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/seller/listing/:id"
+        element={
+          <ProtectedRoute allowedRoles={["seller"]}>
+            <SellerLayout>
+              <ListingBids />
+            </SellerLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/seller/settings"
         element={
           <ProtectedRoute allowedRoles={["seller"]}>
             <SellerLayout>
               <Settings />
+            </SellerLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/seller/earnings"
+        element={
+          <ProtectedRoute allowedRoles={["seller"]}>
+            <SellerLayout>
+              <Earnings role="seller" />
             </SellerLayout>
           </ProtectedRoute>
         }
@@ -146,6 +175,17 @@ function App() {
           <ProtectedRoute allowedRoles={["collector"]}>
             <CollectorLayout>
               <MyBids />
+            </CollectorLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/collector/earnings"
+        element={
+          <ProtectedRoute allowedRoles={["collector"]}>
+            <CollectorLayout>
+              <Earnings role="buyer" />
             </CollectorLayout>
           </ProtectedRoute>
         }

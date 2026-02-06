@@ -71,7 +71,7 @@ export default function ListingBids() {
       <div className="max-w-4xl mx-auto">
         <Button
           variant="ghost"
-          onClick={() => navigate("/seller/my-listings")}
+          onClick={() => navigate("/seller/listings")}
           className="mb-6 text-gray-400 hover:text-white pl-0"
         >
           <ArrowLeft className="mr-2" size={20} />
