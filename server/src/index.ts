@@ -15,12 +15,12 @@ import sellerRouter from "./routes/seller/seller.route";
 import collectorRouter from "./routes/collector/collector.route";
 import listingRouter from "./routes/listing/listing.route";
 import { createServer } from "node:http";
-import { Server as SocketIoServer } from "socket.io";
+import { io } from "./utils/socket";
 
 const app = express();
 const httpServer = createServer(app);
 
-export const io = new SocketIoServer(httpServer, {
+io.attach(httpServer, {
   cors: {
     origin: APP_ORIGIN,
     credentials: true,
