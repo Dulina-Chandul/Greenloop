@@ -13,7 +13,7 @@ import ListingModel, {
 } from "../../models/lising/listing.model";
 import { uploadImageToCloudinary } from "../../services/cloudinary/cloudinary.service";
 import { analyzeWasteImage } from "../../services/ai/gemini.service";
-import { io } from "../..";
+import { io } from "../../utils/socket";
 
 const createListingSchema = z.object({
   title: z.string().min(5).max(100),
@@ -121,6 +121,7 @@ export const listingController = {
     );
 
     if (listing.status === "active") {
+      console.log(`Emitting listing:new for ${listing._id}`);
       io.emit("listing:new", {
         listing: listing.toObject(),
       });
@@ -231,6 +232,7 @@ export const listingController = {
     Object.assign(listing, updateData);
     await listing.save();
 
+    console.log(`Emitting listing:updated for ${listing._id}`);
     io.emit("listing:updated", {
       listingId: listing._id,
       updates: updateData,

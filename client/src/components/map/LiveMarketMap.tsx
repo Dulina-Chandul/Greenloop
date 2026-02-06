@@ -115,7 +115,12 @@ export default function LiveMarketMap({
 
     // Socket.io setup (optional for now)
     try {
-      socketRef.current = io(import.meta.env.VITE_API_URL, {
+      // Connect to the root URL, not the API URL
+      const socketUrl = import.meta.env.VITE_API_URL.replace(
+        /\/api\/v1\/?$/,
+        "",
+      );
+      socketRef.current = io(socketUrl, {
         withCredentials: true,
       });
 

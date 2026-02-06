@@ -15,6 +15,7 @@ const defaults: CookieOptions = {
 export const getAccessTokenCookieOptions = (): CookieOptions => {
   return {
     ...defaults,
+    path: "/",
     expires: fifteenMinutesFromNow(),
   };
 };
