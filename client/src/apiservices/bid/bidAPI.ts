@@ -7,6 +7,7 @@ interface CreateBidParams {
   proposedPickupDate?: string;
   proposedPickupTime?: string;
   hasOwnTransport?: boolean;
+  collectorLocation?: { lat: number; lng: number };
 }
 
 export const createBidAPI = async (data: CreateBidParams) => {

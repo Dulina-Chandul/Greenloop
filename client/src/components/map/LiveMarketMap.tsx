@@ -12,6 +12,9 @@ import { io, Socket } from "socket.io-client";
 import { Loader2 } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import { useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "@/config/api/axiosInstance";
+import { Input } from "@/components/ui/input";
 
 // Fix Leaflet default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -65,6 +68,7 @@ interface Listing {
     lastName: string;
     rating: { average: number };
   };
+  currentHighestBid?: number;
 }
 
 function MapController({ center }: { center: [number, number] }) {
@@ -380,6 +384,30 @@ function ListingDetailsModal({
   onClose: () => void;
 }) {
   const navigate = useNavigate();
+  const [editBidAmount, setEditBidAmount] = useState<number>(0);
+  const [existingBid, setExistingBid] = useState<any>(null);
+
+  // Add query to check existing bid
+  const { data: myBidData } = useQuery({
+    queryKey: ["my-bid", listing._id],
+    queryFn: async () => {
+      const response = await axiosInstance.get(`/bids/my-bids`);
+      const bids = response.data.bids;
+      return bids.find(
+        (b: any) => b.listingId._id === listing._id && b.status === "pending",
+      );
+    },
+  });
+
+  useEffect(() => {
+    if (myBidData) {
+      setExistingBid(myBidData);
+      setEditBidAmount(myBidData.amount);
+    } else {
+      setEditBidAmount((listing.currentHighestBid || 0) + 0.5);
+    }
+  }, [myBidData, listing]);
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[9999] p-4">
       <div className="bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -428,10 +456,23 @@ function ListingDetailsModal({
           </div>
 
           <div className="mb-4">
-            <input
+            {existingBid ? (
+              <div className="mb-4 p-4 bg-blue-900/30 border border-blue-700 rounded-lg">
+                <p className="text-blue-400 text-sm mb-2">Your current bid</p>
+                <p className="text-2xl font-bold text-white">
+                  ${existingBid.amount.toFixed(2)}
+                </p>
+              </div>
+            ) : null}
+
+            <Input
               type="number"
-              placeholder="Enter your bid amount"
-              className="w-full px-4 py-3 bg-gray-700 text-white rounded-lg border-2 border-green-600 focus:outline-none"
+              value={editBidAmount}
+              onChange={(e) => setEditBidAmount(parseFloat(e.target.value))}
+              placeholder="Enter your bid"
+              step="0.1"
+              min={(listing.currentHighestBid || 0) + 0.1}
+              className="bg-gray-700 border-green-600 border-2 text-white text-xl h-14 text-center"
             />
           </div>
 
@@ -442,7 +483,7 @@ function ListingDetailsModal({
               navigate(`/collector/auctions/${listing._id}`);
             }}
           >
-            Place Bid Now 🔨
+            {existingBid ? "Update Bid 🔄" : "Place Bid Now 🔨"}
           </button>
         </div>
       </div>

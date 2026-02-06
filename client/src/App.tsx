@@ -19,6 +19,7 @@ import CollectorLayout from "./components/layout/CollectorLayout";
 import SellerLayout from "./components/layout/SellerLayout";
 import CreateListing from "./pages/seller/CreateListing";
 import AuctionDetails from "./pages/collector/AuctionDetails";
+import MyListings from "./pages/seller/MyListings";
 // import './App.css'
 
 function App() {
@@ -60,6 +61,16 @@ function App() {
           <ProtectedRoute allowedRoles={["seller"]}>
             <SellerLayout>
               <Profile />
+            </SellerLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/seller/listings"
+        element={
+          <ProtectedRoute allowedRoles={["seller"]}>
+            <SellerLayout>
+              <MyListings />
             </SellerLayout>
           </ProtectedRoute>
         }

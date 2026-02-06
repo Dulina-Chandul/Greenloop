@@ -106,7 +106,8 @@ export default function AuctionDetails() {
     }
   }, [listing]);
 
-  const handlePlaceBid = () => {
+  // Find handlePlaceBid and add location
+  const handlePlaceBid = async () => {
     if (!id) return;
     if (bidAmount <= (listing?.currentHighestBid || 0)) {
       setToastMessage("Bid must be higher than current highest bid");
@@ -115,11 +116,37 @@ export default function AuctionDetails() {
       return;
     }
 
-    placeBid({
-      listingId: id,
-      amount: bidAmount,
-      hasOwnTransport: true,
-    });
+    // Get current location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          placeBid({
+            listingId: id,
+            amount: bidAmount,
+            hasOwnTransport: true,
+            collectorLocation: {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            },
+          });
+        },
+        () => {
+          // If location fails, proceed without it
+          placeBid({
+            listingId: id,
+            amount: bidAmount,
+            hasOwnTransport: true,
+          });
+        },
+        { enableHighAccuracy: true },
+      );
+    } else {
+      placeBid({
+        listingId: id,
+        amount: bidAmount,
+        hasOwnTransport: true,
+      });
+    }
   };
 
   // Calculate time remaining
@@ -184,7 +211,7 @@ export default function AuctionDetails() {
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: Listing Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Image */}

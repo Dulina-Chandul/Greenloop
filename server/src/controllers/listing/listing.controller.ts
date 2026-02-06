@@ -243,4 +243,43 @@ export const listingController = {
       data: { listing },
     });
   }),
+  // Add this method to listingController object
+  getSellerListings: catchErrors(async (req, res) => {
+    const sellerId = req.userId;
+
+    const listings = await ListingModel.find({ sellerId })
+      .sort({ createdAt: -1 })
+      .populate("acceptedBuyerId", "firstName lastName");
+
+    return res.status(OK).json({
+      data: { listings, total: listings.length },
+    });
+  }),
+
+  // Add close bidding method
+  closeBidding: catchErrors(async (req, res) => {
+    const { id } = req.params;
+    const sellerId = req.userId;
+
+    const listing = await ListingModel.findById(id);
+    appAssert(listing, NOT_FOUND, "Listing not found");
+    appAssert(
+      listing.sellerId.toString() === sellerId,
+      FORBIDDEN,
+      "Not your listing",
+    );
+
+    listing.status = "bidding_closed";
+    await listing.save();
+
+    io.emit("listing:updated", {
+      listingId: listing._id,
+      updates: { status: "bidding_closed" },
+    });
+
+    return res.status(OK).json({
+      message: "Bidding closed successfully",
+      data: { listing },
+    });
+  }),
 };
