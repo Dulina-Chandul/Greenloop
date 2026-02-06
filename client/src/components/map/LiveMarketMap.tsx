@@ -11,6 +11,7 @@ import L from "leaflet";
 import { io, Socket } from "socket.io-client";
 import { Loader2 } from "lucide-react";
 import "leaflet/dist/leaflet.css";
+import { useNavigate } from "react-router";
 
 // Fix Leaflet default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -378,6 +379,7 @@ function ListingDetailsModal({
   listing: Listing;
   onClose: () => void;
 }) {
+  const navigate = useNavigate();
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[9999] p-4">
       <div className="bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -433,7 +435,13 @@ function ListingDetailsModal({
             />
           </div>
 
-          <button className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+          <button
+            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+            onClick={() => {
+              onClose();
+              navigate(`/collector/auctions/${listing._id}`);
+            }}
+          >
             Place Bid Now 🔨
           </button>
         </div>

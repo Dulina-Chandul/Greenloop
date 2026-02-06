@@ -16,6 +16,7 @@ import collectorRouter from "./routes/collector/collector.route";
 import listingRouter from "./routes/listing/listing.route";
 import { createServer } from "node:http";
 import { io } from "./utils/socket";
+import bidRouter from "./routes/bid/bid.router";
 
 const app = express();
 const httpServer = createServer(app);
@@ -28,16 +29,22 @@ io.attach(httpServer, {
 });
 
 io.on("connection", (socket) => {
-  console.log(`Collector conntected : ${socket.id}`);
+  console.log(`Client connected: ${socket.id}`);
 
   socket.on("collector:join", (data) => {
     const { collectorId, location } = data;
     socket.join(`collector:${collectorId}`);
-    console.log(`Collector ${collectorId} joined with location : ${location}`);
+    console.log(`Collector ${collectorId} joined with location: ${location}`);
+  });
+
+  socket.on("seller:join", (data) => {
+    const { sellerId } = data;
+    socket.join(`seller:${sellerId}`);
+    console.log(`Seller ${sellerId} joined for bid notifications`);
   });
 
   socket.on("disconnect", () => {
-    console.log(`Collector disconnected : ${socket.id}`);
+    console.log(`Client disconnected: ${socket.id}`);
   });
 });
 
@@ -73,6 +80,9 @@ app.use("/api/v1/listings", listingRouter);
 
 //* Collector Routes
 app.use("/api/v1/collector", collectorRouter);
+
+//* Bid Routes
+app.use("/api/v1/bids", bidRouter);
 
 //* Protected Routes
 app.use("/api/v1/user", userRoutes);

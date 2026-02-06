@@ -18,6 +18,7 @@ import CollectorAuctions from "./pages/collector/CollectorAuctions";
 import CollectorLayout from "./components/layout/CollectorLayout";
 import SellerLayout from "./components/layout/SellerLayout";
 import CreateListing from "./pages/seller/CreateListing";
+import AuctionDetails from "./pages/collector/AuctionDetails";
 // import './App.css'
 
 function App() {
@@ -90,6 +91,17 @@ function App() {
           <ProtectedRoute allowedRoles={["collector"]}>
             <CollectorLayout>
               <CollectorAuctions />
+            </CollectorLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/collector/auctions/:id"
+        element={
+          <ProtectedRoute allowedRoles={["collector"]}>
+            <CollectorLayout>
+              <AuctionDetails />
             </CollectorLayout>
           </ProtectedRoute>
         }
