@@ -13,19 +13,23 @@ export default function CollectorAuctions() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // FIXED: Correct order [lat, lng] for Leaflet
           setLocation([position.coords.latitude, position.coords.longitude]);
         },
         (error) => {
           console.error("Location error:", error);
           setLocationError("Unable to get your location");
-          // Fallback to Colombo [lat, lng]
-          setLocation([6.9271, 79.8612]);
+          // Fallback to Mathugama, Kalutara, Sri Lanka
+          setLocation([6.5309, 80.1553]);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
         },
       );
     } else {
       setLocationError("Geolocation not supported");
-      setLocation([6.9271, 79.8612]);
+      setLocation([6.5309, 80.1553]); // Mathugama coordinates
     }
   }, []);
 

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { boolean } from "zod";
 
 export interface BidDocument extends mongoose.Document {
   listingId: mongoose.Types.ObjectId;
@@ -13,6 +14,8 @@ export interface BidDocument extends mongoose.Document {
     distance: number;
     completedJobs: number;
   };
+
+  isHighestBid?: boolean;
 
   proposedPickupDate?: Date;
   proposedPickupTime?: string;
@@ -67,6 +70,11 @@ const bidSchema = new mongoose.Schema<BidDocument>(
         type: Number,
         default: 0,
       },
+    },
+
+    isHighestBid: {
+      type: Boolean,
+      default: false,
     },
 
     proposedPickupDate: Date,
