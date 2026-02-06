@@ -18,6 +18,10 @@ import CollectorAuctions from "./pages/collector/CollectorAuctions";
 import CollectorLayout from "./components/layout/CollectorLayout";
 import SellerLayout from "./components/layout/SellerLayout";
 import CreateListing from "./pages/seller/CreateListing";
+import AuctionDetails from "./pages/collector/AuctionDetails";
+import MyListings from "./pages/seller/MyListings";
+import ListingBids from "./pages/seller/ListingBids";
+import MyBids from "./pages/collector/MyBids";
 // import './App.css'
 
 function App() {
@@ -64,6 +68,16 @@ function App() {
         }
       />
       <Route
+        path="/seller/listings"
+        element={
+          <ProtectedRoute allowedRoles={["seller"]}>
+            <SellerLayout>
+              <MyListings />
+            </SellerLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/seller/settings"
         element={
           <ProtectedRoute allowedRoles={["seller"]}>
@@ -94,6 +108,17 @@ function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/collector/auctions/:id"
+        element={
+          <ProtectedRoute allowedRoles={["collector"]}>
+            <CollectorLayout>
+              <AuctionDetails />
+            </CollectorLayout>
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/collector/profile"
         element={
@@ -111,6 +136,28 @@ function App() {
             <CollectorLayout>
               <Settings />
             </CollectorLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/collector/my-bids"
+        element={
+          <ProtectedRoute allowedRoles={["collector"]}>
+            <CollectorLayout>
+              <MyBids />
+            </CollectorLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/seller/listing/:id/bids"
+        element={
+          <ProtectedRoute allowedRoles={["seller"]}>
+            <SellerLayout>
+              <ListingBids />
+            </SellerLayout>
           </ProtectedRoute>
         }
       />

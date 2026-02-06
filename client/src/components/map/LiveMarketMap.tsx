@@ -11,6 +11,10 @@ import L from "leaflet";
 import { io, Socket } from "socket.io-client";
 import { Loader2 } from "lucide-react";
 import "leaflet/dist/leaflet.css";
+import { useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "@/config/api/axiosInstance";
+import { Input } from "@/components/ui/input";
 
 // Fix Leaflet default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -64,6 +68,7 @@ interface Listing {
     lastName: string;
     rating: { average: number };
   };
+  currentHighestBid?: number;
 }
 
 function MapController({ center }: { center: [number, number] }) {
@@ -378,12 +383,88 @@ function ListingDetailsModal({
   listing: Listing;
   onClose: () => void;
 }) {
+  const navigate = useNavigate();
+  const [editBidAmount, setEditBidAmount] = useState<number>(0);
+  const [existingBid, setExistingBid] = useState<any>(null);
+  const [timeLeft, setTimeLeft] = useState<string>("");
+
+  // Add query to check existing bid
+  const { data: myBidData } = useQuery({
+    queryKey: ["my-bid", listing._id],
+    queryFn: async () => {
+      const response = await axiosInstance.get(`/bids/my-bids`);
+      const bids = response.data.bids;
+      return bids.find(
+        (b: any) => b.listingId._id === listing._id && b.status === "pending",
+      );
+    },
+  });
+
+  useEffect(() => {
+    if (myBidData) {
+      setExistingBid(myBidData);
+      setEditBidAmount(myBidData.amount);
+    } else {
+      setEditBidAmount((listing.currentHighestBid || 0) + 0.5);
+    }
+  }, [myBidData, listing]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      // Assuming listing has a biddingDeadline, if not, we can't show a countdown
+      // The interface shows isUrgent, but we need an actual date.
+      // Let's assume listing object has a deadline or we use a mock one if missing for now?
+      // actually the interface Listing doesn't have biddingDeadline. Let's add it to interface or check backend.
+      // listing.model.ts has biddingDeadline. Listing interface in this file needs it.
+      // Casting listing to any to access biddingDeadline for now to avoid TS error if I can't change interface easily here.
+      const deadline = (listing as any).biddingDeadline;
+      if (!deadline) {
+        setTimeLeft("No Deadline");
+        return;
+      }
+
+      const now = new Date().getTime();
+      const end = new Date(deadline).getTime();
+      const diff = end - now;
+
+      if (diff <= 0) {
+        setTimeLeft("Ended");
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(timer);
+  }, [listing]);
+
+  const handleQuickBid = (increment: number) => {
+    setEditBidAmount((prev) => parseFloat((prev + increment).toFixed(2)));
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[9999] p-4">
       <div className="bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-start mb-4">
-            <h2 className="text-2xl font-bold text-white">{listing.title}</h2>
+            <div>
+              <h2 className="text-2xl font-bold text-white">{listing.title}</h2>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-red-400 font-mono font-bold animate-pulse">
+                  {timeLeft}
+                </span>
+                <span className="text-gray-500">•</span>
+                <span className="text-gray-400 text-sm">Bidding ends soon</span>
+              </div>
+            </div>
+
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-white text-2xl"
@@ -401,7 +482,7 @@ function ListingDetailsModal({
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div className="text-center p-3 bg-gray-700 rounded">
               <div className="text-xs text-gray-400">Material</div>
-              <div className="font-semibold text-white">Mixed Iron</div>
+              <div className="font-semibold text-white">{listing.category}</div>
             </div>
             <div className="text-center p-3 bg-gray-700 rounded">
               <div className="text-xs text-gray-400">Weight</div>
@@ -410,31 +491,79 @@ function ListingDetailsModal({
               </div>
             </div>
             <div className="text-center p-3 bg-gray-700 rounded">
-              <div className="text-xs text-gray-400">Distance</div>
-              <div className="font-semibold text-white">2.5 km</div>
+              <div className="text-xs text-gray-400">Est. Value</div>
+              <div className="font-semibold text-white">
+                ${listing.finalValue}
+              </div>
             </div>
           </div>
 
-          <div className="mb-4 p-4 bg-gray-700 rounded-lg">
-            <div className="text-sm text-gray-400 mb-2">
-              Current Highest Bid
+          <div className="mb-4 p-4 bg-gray-700 rounded-lg flex justify-between items-center">
+            <div>
+              <div className="text-sm text-gray-400 mb-1">
+                Current Highest Bid
+              </div>
+              <div className="text-3xl font-bold text-white">
+                Rs. {(listing.currentHighestBid || 0).toFixed(2)}
+              </div>
             </div>
-            <div className="text-4xl font-bold text-white">
-              Rs. {listing.finalValue}
+            <div className="text-right">
+              <div className="text-sm text-gray-400 mb-1">Total Bidders</div>
+              <div className="text-xl font-bold text-white">3</div>
             </div>
-            <div className="text-sm text-gray-400 mt-1">+2 active bidders</div>
           </div>
 
           <div className="mb-4">
-            <input
-              type="number"
-              placeholder="Enter your bid amount"
-              className="w-full px-4 py-3 bg-gray-700 text-white rounded-lg border-2 border-green-600 focus:outline-none"
-            />
+            {existingBid ? (
+              <div className="mb-4 p-4 bg-blue-900/30 border border-blue-700 rounded-lg">
+                <p className="text-blue-400 text-sm mb-2">Your current bid</p>
+                <div className="flex justify-between items-center">
+                  <p className="text-2xl font-bold text-white">
+                    ${existingBid.amount.toFixed(2)}
+                  </p>
+                  <span className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs uppercase">
+                    {existingBid.status}
+                  </span>
+                </div>
+              </div>
+            ) : null}
+
+            <div className="space-y-3">
+              <label className="text-sm text-gray-400">Place your bid</label>
+              <Input
+                type="number"
+                value={editBidAmount}
+                onChange={(e) => setEditBidAmount(parseFloat(e.target.value))}
+                placeholder="Enter your bid"
+                step="0.1"
+                min={(listing.currentHighestBid || 0) + 0.1}
+                className="bg-gray-700 border-green-600 border-2 text-white text-xl h-14 text-center"
+              />
+
+              <div className="flex gap-2 justify-center">
+                {[0.5, 1.0, 2.0].map((inc) => (
+                  <button
+                    key={inc}
+                    onClick={() => handleQuickBid(inc)}
+                    className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-green-400 border border-green-500/30 rounded-full text-sm transition-colors"
+                  >
+                    +${inc.toFixed(2)}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <button className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
-            Place Bid Now 🔨
+          <button
+            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+            onClick={() => {
+              onClose();
+              navigate(`/collector/auctions/${listing._id}`, {
+                state: { initialBid: editBidAmount },
+              });
+            }}
+          >
+            {existingBid ? "Manage Bid Details ➝" : "Proceed to Bid ➝"}
           </button>
         </div>
       </div>
