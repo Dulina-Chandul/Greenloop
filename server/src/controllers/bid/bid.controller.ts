@@ -294,4 +294,60 @@ export const bidController = {
       message: "Bid withdrawn successfully",
     });
   }),
+
+  //* Accept bid
+  acceptBid: catchErrors(async (req, res) => {
+    const { id } = req.params;
+    const sellerId = req.userId;
+
+    const bid = await BidModel.findById(id);
+    appAssert(bid, NOT_FOUND, "Bid not found");
+
+    const listing = await ListingModel.findById(bid.listingId);
+    appAssert(listing, NOT_FOUND, "Listing not found");
+    appAssert(
+      listing.sellerId.toString() === sellerId,
+      FORBIDDEN,
+      "You can only accept bids on your own listings",
+    );
+    appAssert(
+      listing.status === "active",
+      BAD_REQUEST,
+      "Listing is not active",
+    );
+
+    // Update bid status
+    bid.status = "accepted";
+    bid.respondedAt = new Date();
+    await bid.save();
+
+    // Update listing
+    listing.status = "sold";
+    listing.acceptedBidId = bid._id as any;
+    listing.acceptedBuyerId = bid.bidderId;
+    listing.closedAt = new Date();
+    await listing.save();
+
+    // Reject all other pending bids
+    await BidModel.updateMany(
+      { listingId: listing._id, _id: { $ne: bid._id }, status: "pending" },
+      { status: "rejected", respondedAt: new Date() },
+    );
+
+    // Emit socket events
+    io.emit("listing:updated", {
+      listingId: listing._id,
+      updates: { status: "sold" },
+    });
+
+    io.to(`collector:${bid.bidderId}`).emit("bid:accepted", {
+      listingId: listing._id,
+      bidId: bid._id,
+    });
+
+    return res.status(OK).json({
+      message: "Bid accepted successfully",
+      data: { bid, listing },
+    });
+  }),
 };

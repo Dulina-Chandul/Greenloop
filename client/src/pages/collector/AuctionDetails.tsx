@@ -20,13 +20,17 @@ import { io, Socket } from "socket.io-client";
 import { useAppSelector } from "@/redux/hooks/hooks";
 import { selectUser } from "@/redux/slices/authSlice";
 
+import { useLocation } from "react-router";
+
 export default function AuctionDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const user = useAppSelector(selectUser);
 
   const [bidAmount, setBidAmount] = useState<number>(0);
+  const [timeLeft, setTimeLeft] = useState<string>("");
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -95,58 +99,169 @@ export default function AuctionDetails() {
     };
   }, [id, queryClient]);
 
+  // Update bid mutation
+  const { mutate: updateBid, isPending: isUpdating } = useMutation({
+    mutationFn: async (data: { bidId: string; amount: number }) => {
+      await axiosInstance.put(`/bids/${data.bidId}`, { amount: data.amount });
+    },
+    onSuccess: () => {
+      setToastMessage("Bid updated successfully!");
+      setShowToast(true);
+      queryClient.invalidateQueries({ queryKey: ["listing", id] });
+      queryClient.invalidateQueries({ queryKey: ["listing-bids", id] });
+      setTimeout(() => setShowToast(false), 3000);
+    },
+    onError: (error: any) => {
+      setToastMessage(error?.message || "Failed to update bid");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    },
+  });
+
+  // Withdraw bid mutation
+  const { mutate: withdrawBid, isPending: isWithdrawing } = useMutation({
+    mutationFn: async (bidId: string) => {
+      await axiosInstance.delete(`/bids/${bidId}`);
+    },
+    onSuccess: () => {
+      setToastMessage("Bid withdrawn successfully");
+      setShowToast(true);
+      queryClient.invalidateQueries({ queryKey: ["listing", id] });
+      queryClient.invalidateQueries({ queryKey: ["listing-bids", id] });
+      setBidAmount(0); // Reset bid input? Or set to min
+      setTimeout(() => setShowToast(false), 3000);
+    },
+    onError: (error: any) => {
+      setToastMessage(error?.message || "Failed to withdraw bid");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    },
+  });
+
+  // Socket setup (omitted for brevity, assume present)
+  // ...
+
   // Set initial bid amount
   useEffect(() => {
-    if (listing?.currentHighestBid) {
+    // Check if user has an active bid
+    const myBid = bids?.find(
+      (b: any) => b.bidderId._id === user?._id && b.status === "pending",
+    );
+
+    if (location.state?.initialBid) {
+      setBidAmount(location.state.initialBid);
+    } else if (myBid) {
+      setBidAmount(myBid.amount);
+    } else if (listing?.currentHighestBid) {
       setBidAmount(listing.currentHighestBid + 0.5);
     } else if (listing?.minimumBid) {
       setBidAmount(listing.minimumBid);
     } else {
       setBidAmount(listing?.finalValue || 0);
     }
+  }, [listing, bids, user, location.state]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      if (!listing?.biddingDeadline) {
+        setTimeLeft("No Deadline");
+        return;
+      }
+      const now = new Date().getTime();
+      const deadline = new Date(listing.biddingDeadline).getTime();
+      const diff = deadline - now;
+
+      if (diff <= 0) {
+        setTimeLeft("Ended");
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(timer);
   }, [listing]);
 
-  // Find handlePlaceBid and add location
   const handlePlaceBid = async () => {
     if (!id) return;
-    if (bidAmount <= (listing?.currentHighestBid || 0)) {
+
+    const myBid = bids?.find(
+      (b: any) => b.bidderId._id === user?._id && b.status === "pending",
+    );
+
+    if (bidAmount <= (listing?.currentHighestBid || 0) && !myBid) {
+      // Allow updating to same amount? No, must be higher usually unless just updating time/msg. But logic says new bid > current highest?
+      // Actually if I am highest bidder I might want to increase my bid?
+      // Or if I am outbid.
+      // Let's stick to standard: amount > currentHighestBid
       setToastMessage("Bid must be higher than current highest bid");
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
       return;
     }
 
-    // Get current location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          placeBid({
-            listingId: id,
-            amount: bidAmount,
-            hasOwnTransport: true,
-            collectorLocation: {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            },
-          });
-        },
-        () => {
-          // If location fails, proceed without it
-          placeBid({
-            listingId: id,
-            amount: bidAmount,
-            hasOwnTransport: true,
-          });
-        },
-        { enableHighAccuracy: true },
-      );
+    if (myBid) {
+      // Update existing bid
+      updateBid({ bidId: myBid._id, amount: bidAmount });
     } else {
-      placeBid({
-        listingId: id,
-        amount: bidAmount,
-        hasOwnTransport: true,
-      });
+      // Place new bid
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            placeBid({
+              listingId: id,
+              amount: bidAmount,
+              hasOwnTransport: true,
+              collectorLocation: {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              },
+            });
+          },
+          () => {
+            placeBid({
+              listingId: id,
+              amount: bidAmount,
+              hasOwnTransport: true,
+              collectorLocation: { lat: 0, lng: 0 }, // Fallback
+            });
+          },
+        );
+      } else {
+        placeBid({
+          listingId: id,
+          amount: bidAmount,
+          hasOwnTransport: true,
+          collectorLocation: { lat: 0, lng: 0 },
+        });
+      }
     }
+  };
+
+  const handleWithdrawBid = () => {
+    const myBid = bids?.find(
+      (b: any) => b.bidderId._id === user?._id && b.status === "pending",
+    );
+    if (myBid) {
+      if (
+        confirm(
+          "Are you sure you want to withdraw your bid? This cannot be undone.",
+        )
+      ) {
+        withdrawBid(myBid._id);
+      }
+    }
+  };
+
+  const handleQuickBid = (increment: number) => {
+    setBidAmount((prev) => parseFloat((prev + increment).toFixed(2)));
   };
 
   // Calculate time remaining
@@ -423,8 +538,42 @@ export default function AuctionDetails() {
                 className="w-full bg-green-600 hover:bg-green-700 h-12 text-lg font-semibold"
               >
                 <Hammer className="mr-2" size={20} />
-                {isPending ? "Placing Bid..." : "Place Bid Now"}
+                {isPending || isUpdating
+                  ? "Processing..."
+                  : bids?.find(
+                        (b: any) =>
+                          b.bidderId._id === user?._id &&
+                          b.status === "pending",
+                      )
+                    ? "Update Bid"
+                    : "Place Bid Now"}
               </Button>
+
+              <div className="mt-3 flex gap-2 justify-center">
+                {[0.5, 1.0, 5.0, 10.0].map((inc) => (
+                  <button
+                    key={inc}
+                    onClick={() => handleQuickBid(inc)}
+                    className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-green-400 border border-green-500/30 rounded-full text-xs transition-colors"
+                  >
+                    +${inc}
+                  </button>
+                ))}
+              </div>
+
+              {bids?.find(
+                (b: any) =>
+                  b.bidderId._id === user?._id && b.status === "pending",
+              ) && (
+                <Button
+                  onClick={handleWithdrawBid}
+                  disabled={isWithdrawing}
+                  variant="outline"
+                  className="w-full mt-3 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                >
+                  Withdraw Bid
+                </Button>
+              )}
 
               {/* Timer */}
               <div className="mt-6 pt-6 border-t border-gray-700">
@@ -433,7 +582,7 @@ export default function AuctionDetails() {
                     CLOSING SOON
                   </span>
                   <span className="text-white text-xl font-bold">
-                    {getTimeRemaining()}
+                    {timeLeft}
                   </span>
                 </div>
                 <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">

@@ -20,6 +20,8 @@ import SellerLayout from "./components/layout/SellerLayout";
 import CreateListing from "./pages/seller/CreateListing";
 import AuctionDetails from "./pages/collector/AuctionDetails";
 import MyListings from "./pages/seller/MyListings";
+import ListingBids from "./pages/seller/ListingBids";
+import MyBids from "./pages/collector/MyBids";
 // import './App.css'
 
 function App() {
@@ -134,6 +136,28 @@ function App() {
             <CollectorLayout>
               <Settings />
             </CollectorLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/collector/my-bids"
+        element={
+          <ProtectedRoute allowedRoles={["collector"]}>
+            <CollectorLayout>
+              <MyBids />
+            </CollectorLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/seller/listing/:id/bids"
+        element={
+          <ProtectedRoute allowedRoles={["seller"]}>
+            <SellerLayout>
+              <ListingBids />
+            </SellerLayout>
           </ProtectedRoute>
         }
       />
