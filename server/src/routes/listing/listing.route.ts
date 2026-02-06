@@ -43,6 +43,9 @@ listingRouter.put(
   listingController.updateListing,
 );
 
+//* Get all listings (no radius filter)
+listingRouter.get("/all", authenticate, listingController.getAllListings);
+
 //* Get nearby listings
 listingRouter.get("/nearby", authenticate, listingController.getNearbyListings);
 

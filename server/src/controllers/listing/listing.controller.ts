@@ -163,6 +163,20 @@ export const listingController = {
     });
   }),
 
+  //* Get all active listings (no radius filter)
+  getAllListings: catchErrors(async (req, res) => {
+    const listings = await ListingModel.find({
+      status: "active",
+    })
+      .populate("sellerId", "firstName lastName rating accountType")
+      .sort({ createdAt: -1 })
+      .limit(200); // Reasonable limit to prevent performance issues
+
+    return res.status(OK).json({
+      data: { listings, total: listings.length },
+    });
+  }),
+
   //* Get the nearby listings
   getNearbyListings: catchErrors(async (req, res) => {
     const { longitude, latitude, radius = 10 } = req.query;

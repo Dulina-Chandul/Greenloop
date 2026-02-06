@@ -27,23 +27,65 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-// Custom blinking marker
-const createBlinkingIcon = (isUrgent: boolean = false) => {
+// Simple professional listing marker
+const createListingIcon = (isUrgent: boolean = false) => {
   return L.divIcon({
     className: "custom-marker",
     html: `
-      <div class="relative">
-        <div class="absolute inset-0 ${isUrgent ? "animate-ping" : "animate-pulse"} bg-green-500 rounded-full opacity-75 w-8 h-8"></div>
-        <div class="relative bg-green-600 rounded-full w-8 h-8 flex items-center justify-center shadow-lg border-2 border-white">
-          <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+      <div style="position: relative; width: 30px; height: 30px;">
+        <div style="
+          width: 30px;
+          height: 30px;
+          background: ${isUrgent ? "#ef4444" : "#10b981"};
+          border: 2px solid white;
+          border-radius: 50% 50% 50% 0;
+          transform: rotate(-45deg);
+          box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        "></div>
+        <div style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 8px;
+          height: 8px;
+          background: white;
+          border-radius: 50%;
+        "></div>
+      </div>
+    `,
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30],
+  });
+};
+
+// Collector vehicle marker
+const createCollectorIcon = () => {
+  return L.divIcon({
+    className: "collector-marker",
+    html: `
+      <div style="position: relative; width: 40px; height: 40px;">
+        <div style="
+          width: 40px;
+          height: 40px;
+          background: #3b82f6;
+          border: 3px solid white;
+          border-radius: 50%;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+            <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
           </svg>
         </div>
       </div>
     `,
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, -20],
   });
 };
 
@@ -64,6 +106,7 @@ interface Listing {
   category: string;
   isUrgent?: boolean;
   sellerId: {
+    _id: string;
     firstName: string;
     lastName: string;
     rating: { average: number };
@@ -93,11 +136,11 @@ export default function LiveMarketMap({
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
-  const fetchNearbyListings = async () => {
+  const fetchAllListings = async () => {
     try {
-      const [lat, lng] = collectorLocation;
+      // Fetch ALL listings without radius restriction
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/listings/nearby?longitude=${lng}&latitude=${lat}&radius=10`,
+        `${import.meta.env.VITE_API_URL}/listings/all`,
         { credentials: "include" },
       );
 
@@ -106,8 +149,8 @@ export default function LiveMarketMap({
       }
 
       const data = await response.json();
-      console.log("Fetched listings:", data);
-      setListings(data.data.listings || []);
+      console.log("Fetched all listings:", data);
+      setListings(data.data?.listings || data.listings || []);
     } catch (error) {
       console.error("Failed to fetch listings:", error);
     } finally {
@@ -116,7 +159,7 @@ export default function LiveMarketMap({
   };
 
   useEffect(() => {
-    fetchNearbyListings();
+    fetchAllListings();
 
     // Socket.io setup (optional for now)
     try {
@@ -146,6 +189,24 @@ export default function LiveMarketMap({
               ? { ...listing, ...data.updates }
               : listing,
           ),
+        );
+      });
+      socketRef.current.on("seller:location_update", (data) => {
+        console.log("Seller moved:", data);
+        setListings((prev) =>
+          prev.map((listing) => {
+            // Check if this listing belongs to the moving seller
+            if (listing.sellerId._id === data.sellerId) {
+              return {
+                ...listing,
+                location: {
+                  ...listing.location,
+                  coordinates: [data.location.lng, data.location.lat], // GeoJSON [lng, lat]
+                },
+              };
+            }
+            return listing;
+          }),
         );
       });
     } catch (error) {
@@ -182,23 +243,24 @@ export default function LiveMarketMap({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {/* Collector's location */}
-          <Marker position={collectorLocation}>
+          {/* Collector's location with vehicle icon */}
+          <Marker position={collectorLocation} icon={createCollectorIcon()}>
             <Popup>
-              <div className="text-sm font-medium">Your Location</div>
+              <div className="text-sm">
+                <div className="font-semibold text-blue-600 mb-1">
+                  📍 Your Location
+                </div>
+                <div className="text-xs text-gray-600">
+                  Lat: {collectorLocation[0].toFixed(6)}
+                </div>
+                <div className="text-xs text-gray-600">
+                  Lng: {collectorLocation[1].toFixed(6)}
+                </div>
+              </div>
             </Popup>
           </Marker>
 
-          {/* Service radius */}
-          <Circle
-            center={collectorLocation}
-            radius={10000}
-            pathOptions={{
-              color: "green",
-              fillColor: "green",
-              fillOpacity: 0.1,
-            }}
-          />
+          {/* Removed radius restriction - showing all listings */}
 
           {/* Listing markers */}
           {listings.map((listing) => {
@@ -208,30 +270,47 @@ export default function LiveMarketMap({
               <Marker
                 key={listing._id}
                 position={[lat, lng]}
-                icon={createBlinkingIcon(listing.isUrgent)}
+                icon={createListingIcon(listing.isUrgent)}
                 eventHandlers={{
                   click: () => setSelectedListing(listing),
                 }}
               >
-                <Popup>
-                  <div className="w-48">
+                <Popup autoPan={false}>
+                  <div className="w-56">
                     <img
                       src={listing.primaryImage}
                       alt={listing.title}
-                      className="w-full h-24 object-cover rounded mb-2"
+                      className="w-full h-32 object-cover rounded-lg mb-2"
                     />
-                    <h3 className="font-semibold text-sm">{listing.title}</h3>
-                    <p className="text-xs text-gray-600">
-                      {listing.address.city}
+                    <h3 className="font-semibold text-base mb-1">
+                      {listing.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-2">
+                      📍 {listing.address.city}, {listing.address.district}
                     </p>
-                    <div className="flex gap-2 mt-2 text-xs">
-                      <span className="bg-green-100 text-green-700 px-2 py-1 rounded">
-                        {listing.finalWeight} kg
+                    <div className="flex gap-2 mb-2">
+                      <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
+                        ⚖️ {listing.finalWeight} kg
                       </span>
-                      <span className="font-semibold">
-                        Rs. {listing.finalValue}
+                      <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
+                        💰 Rs. {listing.finalValue}
                       </span>
                     </div>
+                    <div className="text-xs text-gray-500 mb-2">
+                      Category:{" "}
+                      <span className="font-medium">{listing.category}</span>
+                    </div>
+                    {listing.currentHighestBid && (
+                      <div className="text-xs text-orange-600 font-medium">
+                        🔥 Current Bid: Rs. {listing.currentHighestBid}
+                      </div>
+                    )}
+                    <button
+                      onClick={() => setSelectedListing(listing)}
+                      className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white text-xs font-medium py-1.5 rounded"
+                    >
+                      View Details
+                    </button>
                   </div>
                 </Popup>
               </Marker>
@@ -269,14 +348,16 @@ export default function LiveMarketMap({
       {/* Right Sidebar - Nearby Jobs */}
       <div className="w-80 lg:w-96 bg-gray-800 p-4 overflow-y-auto hidden md:block">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-white">Nearby Jobs</h2>
+          <h2 className="text-xl font-bold text-white">
+            All Available Listings
+          </h2>
           <span className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
             {listings.length} Active
           </span>
         </div>
 
         <p className="text-gray-400 text-sm mb-4">
-          Scrap collection opportunities near you.
+          All scrap collection opportunities across the platform.
         </p>
 
         <div className="space-y-3">
@@ -326,7 +407,7 @@ export default function LiveMarketMap({
         <div className="p-4">
           <div className="w-12 h-1 bg-gray-600 rounded-full mx-auto mb-4"></div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-white">Nearby Jobs</h2>
+            <h2 className="text-lg font-bold text-white">All Listings</h2>
             <span className="bg-green-600 text-white px-2 py-1 rounded-full text-xs">
               {listings.length}
             </span>
@@ -392,11 +473,18 @@ function ListingDetailsModal({
   const { data: myBidData } = useQuery({
     queryKey: ["my-bid", listing._id],
     queryFn: async () => {
-      const response = await axiosInstance.get(`/bids/my-bids`);
-      const bids = response.data.bids;
-      return bids.find(
-        (b: any) => b.listingId._id === listing._id && b.status === "pending",
-      );
+      try {
+        const response = await axiosInstance.get(`/bids/my-bids`);
+        const bids = response.data.bids;
+        const foundBid = bids.find(
+          (b: any) => b.listingId._id === listing._id && b.status === "pending",
+        );
+        // Return null instead of undefined if no bid found
+        return foundBid || null;
+      } catch (error) {
+        console.error("Error fetching my bids:", error);
+        return null;
+      }
     },
   });
 

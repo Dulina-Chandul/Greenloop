@@ -17,6 +17,7 @@ import listingRouter from "./routes/listing/listing.route";
 import { createServer } from "node:http";
 import { io } from "./utils/socket";
 import bidRouter from "./routes/bid/bid.router";
+import transactionRouter from "./routes/transaction/transaction.route";
 
 const app = express();
 const httpServer = createServer(app);
@@ -41,6 +42,20 @@ io.on("connection", (socket) => {
     const { sellerId } = data;
     socket.join(`seller:${sellerId}`);
     console.log(`Seller ${sellerId} joined for bid notifications`);
+  });
+
+  socket.on("seller:location_update", (data) => {
+    // Broadcast the new location to all connected clients (collectors)
+    io.emit("seller:location_update", data);
+  });
+
+  socket.on("collector:location_update", (data) => {
+    // Broadcast collector location updates to all connected clients
+    console.log(
+      `Collector ${data.collectorId} location update:`,
+      data.location,
+    );
+    io.emit("collector:location_update", data);
   });
 
   socket.on("disconnect", () => {
@@ -83,6 +98,9 @@ app.use("/api/v1/collector", collectorRouter);
 
 //* Bid Routes
 app.use("/api/v1/bids", bidRouter);
+
+//* Transaction Routes
+app.use("/api/v1/transactions", transactionRouter);
 
 //* Protected Routes
 app.use("/api/v1/user", userRoutes);

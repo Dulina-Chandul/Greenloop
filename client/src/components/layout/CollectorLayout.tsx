@@ -9,6 +9,7 @@ import {
   Settings,
   Menu,
   X,
+  FileText,
 } from "lucide-react";
 import UserMenu from "@/pages/common/UserMenu";
 
@@ -23,6 +24,7 @@ export default function CollectorLayout({ children }: CollectorLayoutProps) {
   const menuItems = [
     { icon: LayoutGrid, label: "Overview", path: "/collector/dashboard" },
     { icon: Gavel, label: "Auctions", path: "/collector/auctions" },
+    { icon: FileText, label: "My Bids", path: "/collector/my-bids" },
     { icon: DollarSign, label: "Earnings", path: "/collector/earnings" },
     { icon: RouteIcon, label: "Routes", path: "/collector/routes" },
     { icon: Star, label: "Reputation", path: "/collector/reputation" },
