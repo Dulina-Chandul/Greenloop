@@ -7,9 +7,7 @@ export const transactionController = {
   //* Get transactions (Earnings/Orders)
   getTransactions: catchErrors(async (req, res) => {
     const userId = req.userId;
-    const { role, status } = req.query; // role: 'seller' | 'buyer', status: 'active' | 'history'
-
-    console.log("getTransactions Debug:", { userId, role, status });
+    const { role, status } = req.query;
 
     const filter: any = {};
     if (role === "seller") {
@@ -24,17 +22,12 @@ export const transactionController = {
       filter.status = { $in: ["completed", "cancelled", "disputed"] };
     }
 
-    console.log("Transaction Filter:", JSON.stringify(filter, null, 2));
-
     const transactions = await TransactionModel.find(filter)
-      .populate("listingId", "title primaryImage")
+      .populate("listingId", "title primaryImage _id")
       .populate("sellerId", "firstName lastName")
-      .populate("buyerId", "firstName lastName")
+      .populate("buyerId", "firstName lastName phoneNumber address email")
       .sort({ createdAt: -1 });
 
-    console.log("Found transactions:", transactions.length);
-
-    // Calculate total earnings/spending for history
     let totalAmount = 0;
     if (status === "history") {
       totalAmount = transactions.reduce((sum, t) => sum + t.agreedPrice, 0);

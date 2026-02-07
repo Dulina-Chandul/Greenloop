@@ -9,6 +9,9 @@ import {
   Award,
   Hammer,
   MapPin,
+  Eye,
+  Phone,
+  User,
 } from "lucide-react";
 import { getMyBidsAPI } from "@/apiservices/bid/bidAPI";
 import { useEffect, useRef, useState } from "react";
@@ -96,10 +99,8 @@ export default function CollectorDashboard() {
 
   // Clear location cache on mount for better accuracy
   useEffect(() => {
-    // Clear any cached geolocation data
     if ("geolocation" in navigator) {
       try {
-        // Force fresh location request
         navigator.permissions
           ?.query({ name: "geolocation" as PermissionName })
           .then((result) => {
@@ -110,15 +111,6 @@ export default function CollectorDashboard() {
       }
     }
   }, []);
-
-  // Manual location refresh function
-  const refreshLocation = () => {
-    // Toggle tracking to force fresh GPS reading
-    if (isLiveTracking) {
-      setIsLiveTracking(false);
-      setTimeout(() => setIsLiveTracking(true), 100);
-    }
-  };
 
   // Fetch my bids
   const { data: bidsData } = useQuery({
@@ -217,133 +209,6 @@ export default function CollectorDashboard() {
           </div>
         </div>
 
-        {/* Manual Location Adjustment */}
-        {isLiveTracking && (
-          <div className="mb-6 bg-gradient-to-r from-blue-900/30 to-purple-900/30 p-5 rounded-lg border border-blue-700">
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <h3 className="text-white font-semibold mb-1">
-                  🎯 Manual Location Adjustment
-                </h3>
-                <p className="text-sm text-gray-300">
-                  {useManualLocation
-                    ? "Using your custom location"
-                    : "GPS inaccurate? Set your exact location"}
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  if (useManualLocation) {
-                    setUseManualLocation(false);
-                    setManualLocation(null);
-                  } else if (location) {
-                    setManualLocation({
-                      lat: location.latitude,
-                      lng: location.longitude,
-                    });
-                    setUseManualLocation(true);
-                  }
-                }}
-                className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
-                  useManualLocation
-                    ? "bg-gray-600 hover:bg-gray-700 text-white"
-                    : "bg-blue-600 hover:bg-blue-700 text-white"
-                }`}
-              >
-                {useManualLocation ? "Use GPS" : "Set Manual"}
-              </button>
-            </div>
-
-            {useManualLocation && (
-              <div className="space-y-3 mt-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs text-gray-300 mb-1 block">
-                      Latitude
-                    </label>
-                    <input
-                      type="number"
-                      step="0.000001"
-                      value={manualLocation?.lat || ""}
-                      onChange={(e) =>
-                        setManualLocation((prev) => ({
-                          lat: parseFloat(e.target.value) || 0,
-                          lng: prev?.lng || 0,
-                        }))
-                      }
-                      className="w-full p-2 bg-gray-700 text-white rounded text-sm border border-gray-600 focus:border-blue-500 outline-none"
-                      placeholder="6.5854"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-300 mb-1 block">
-                      Longitude
-                    </label>
-                    <input
-                      type="number"
-                      step="0.000001"
-                      value={manualLocation?.lng || ""}
-                      onChange={(e) =>
-                        setManualLocation((prev) => ({
-                          lat: prev?.lat || 0,
-                          lng: parseFloat(e.target.value) || 0,
-                        }))
-                      }
-                      className="w-full p-2 bg-gray-700 text-white rounded text-sm border border-gray-600 focus:border-blue-500 outline-none"
-                      placeholder="79.9607"
-                    />
-                  </div>
-                </div>
-                <div className="bg-blue-900/30 p-3 rounded">
-                  <p className="text-xs text-blue-300 mb-2">
-                    💡 <strong>How to get your exact coordinates:</strong>
-                  </p>
-                  <ol className="text-xs text-gray-300 space-y-1 ml-4">
-                    <li>
-                      1. Open{" "}
-                      <a
-                        href="https://www.google.com/maps"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-400 underline"
-                      >
-                        Google Maps
-                      </a>
-                    </li>
-                    <li>2. Right-click on your exact location</li>
-                    <li>3. Click the coordinates to copy them</li>
-                    <li>
-                      4. Paste them above (latitude first, then longitude)
-                    </li>
-                  </ol>
-                </div>
-                {manualLocation && (
-                  <div className="text-xs text-green-400">
-                    ✅ Broadcasting: {manualLocation.lat.toFixed(6)},{" "}
-                    {manualLocation.lng.toFixed(6)}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!useManualLocation && location && location.accuracy > 100 && (
-              <div className="mt-3 bg-yellow-900/30 p-3 rounded border border-yellow-700">
-                <p className="text-sm text-yellow-300">
-                  ⚠️{" "}
-                  <strong>
-                    GPS Accuracy: ±{location.accuracy.toFixed(0)}m
-                  </strong>{" "}
-                  - This is very inaccurate!
-                </p>
-                <p className="text-xs text gray-300 mt-1">
-                  Showing {location.latitude.toFixed(6)},{" "}
-                  {location.longitude.toFixed(6)}
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => {
@@ -368,7 +233,7 @@ export default function CollectorDashboard() {
           })}
         </div>
 
-        {/* Active Bids & Recent Collections */}
+        {/* Active Bids & Recent Wins */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Active Bids */}
           <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
@@ -421,9 +286,14 @@ export default function CollectorDashboard() {
             </div>
           </div>
 
-          {/* Recent Won Bids */}
+          {/* Recent Wins - NOW CLICKABLE */}
           <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-            <h2 className="text-xl font-bold text-white mb-4">Recent Wins</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-white">Recent Wins</h2>
+              <span className="text-sm text-gray-400">
+                {wonBids.length} won
+              </span>
+            </div>
             <div className="space-y-3">
               {wonBids.length === 0 ? (
                 <div className="text-center py-8">
@@ -434,27 +304,63 @@ export default function CollectorDashboard() {
                 wonBids.slice(0, 3).map((bid: any) => (
                   <div
                     key={bid._id}
-                    className="flex items-center gap-4 p-3 bg-gray-700 rounded-lg"
+                    className="bg-gray-700 rounded-lg p-4 cursor-pointer hover:bg-gray-600 transition-colors"
                   >
-                    <img
-                      src={bid.listingId?.primaryImage}
-                      alt={bid.listingId?.title}
-                      className="w-12 h-12 rounded object-cover"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-white font-medium text-sm truncate">
-                        {bid.listingId?.title}
-                      </h3>
-                      <p className="text-gray-400 text-xs">
-                        Won {new Date(bid.respondedAt).toLocaleDateString()}
-                      </p>
+                    <div className="flex items-center gap-4 mb-3">
+                      <img
+                        src={bid.listingId?.primaryImage}
+                        alt={bid.listingId?.title}
+                        className="w-16 h-16 rounded object-cover"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-white font-medium text-sm truncate mb-1">
+                          {bid.listingId?.title}
+                        </h3>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-400">
+                            Won {new Date(bid.respondedAt).toLocaleDateString()}
+                          </span>
+                          <span className="text-green-400 font-bold">
+                            ${bid.amount.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-white font-semibold">
-                        ${bid.amount.toFixed(2)}
-                      </p>
-                      <span className="text-xs text-green-400">Won</span>
-                    </div>
+
+                    {/* Seller Contact Info */}
+                    {bid.listingId?.sellerId && (
+                      <div className="border-t border-gray-600 pt-3 space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-gray-300">
+                          <User size={14} className="text-gray-400" />
+                          <span>
+                            {bid.listingId.sellerId.firstName}{" "}
+                            {bid.listingId.sellerId.lastName}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Phone size={14} className="text-gray-400" />
+                          <a
+                            href={`tel:${bid.listingId.sellerId.phoneNumber}`}
+                            className="text-green-400 hover:text-green-300 text-sm"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {bid.listingId.sellerId.phoneNumber}
+                          </a>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(
+                              `/collector/auctions/${bid.listingId._id}`,
+                            );
+                          }}
+                          className="w-full mt-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Eye size={14} />
+                          View Full Details
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))
               )}

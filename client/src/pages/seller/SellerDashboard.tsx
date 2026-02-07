@@ -11,9 +11,53 @@ import {
   Play,
   BarChart3,
   Eye,
+  CheckCircle2,
+  Clock,
+  XCircle,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/config/api/axiosInstance";
+
+// Status configuration with distinct styling
+const STATUS_CONFIG = {
+  active: {
+    label: "BIDDING LIVE",
+    color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/50",
+    icon: Clock,
+    dotColor: "bg-emerald-400",
+  },
+  sold: {
+    label: "SOLD",
+    color: "bg-blue-500/20 text-blue-400 border-blue-500/50",
+    icon: CheckCircle2,
+    dotColor: "bg-blue-400",
+  },
+  bidding_closed: {
+    label: "PENDING PICKUP",
+    color: "bg-amber-500/20 text-amber-400 border-amber-500/50",
+    icon: AlertCircle,
+    dotColor: "bg-amber-400",
+  },
+  draft: {
+    label: "ANALYZING",
+    color: "bg-purple-500/20 text-purple-400 border-purple-500/50",
+    icon: Sparkles,
+    dotColor: "bg-purple-400",
+  },
+  cancelled: {
+    label: "CANCELLED",
+    color: "bg-red-500/20 text-red-400 border-red-500/50",
+    icon: XCircle,
+    dotColor: "bg-red-400",
+  },
+  expired: {
+    label: "EXPIRED",
+    color: "bg-gray-500/20 text-gray-400 border-gray-500/50",
+    icon: XCircle,
+    dotColor: "bg-gray-400",
+  },
+};
 
 export default function SellerDashboard() {
   const user = useAppSelector(selectUser);
@@ -33,6 +77,24 @@ export default function SellerDashboard() {
   const totalEarnings = listings
     .filter((l: any) => l.status === "sold")
     .reduce((sum: number, l: any) => sum + (l.currentHighestBid || 0), 0);
+
+  const getStatusBadge = (status: string) => {
+    const config =
+      STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] ||
+      STATUS_CONFIG.draft;
+    const Icon = config.icon;
+
+    return (
+      <span
+        className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${config.color} flex items-center gap-1.5 w-fit`}
+      >
+        <span
+          className={`w-2 h-2 rounded-full ${config.dotColor} ${status === "active" ? "animate-pulse" : ""}`}
+        />
+        {config.label}
+      </span>
+    );
+  };
 
   return (
     <div className="h-full overflow-y-auto bg-gray-900">
@@ -65,14 +127,13 @@ export default function SellerDashboard() {
 
           <div className="flex flex-wrap gap-4">
             <Button
-              onClick={() => navigate("/seller/analysis")}
+              onClick={() => navigate("/seller/create-listing")}
               className="bg-green-600 hover:bg-green-700 h-14 px-8 text-lg"
             >
-              <BarChart3 className="mr-2" size={20} />
-              Scan Waste with AI
+              <Plus className="mr-2" size={20} />
+              Create New Listing
             </Button>
             <Button
-              onClick={() => navigate("/seller/create-listing")}
               variant="outline"
               className="h-14 px-8 text-lg border-gray-600 hover:bg-gray-800"
             >
@@ -171,6 +232,7 @@ export default function SellerDashboard() {
                     <th className="text-left p-4 text-sm font-medium text-gray-400">
                       Item Name
                     </th>
+
                     <th className="text-left p-4 text-sm font-medium text-gray-400">
                       Category
                     </th>
@@ -190,9 +252,16 @@ export default function SellerDashboard() {
                     <tr
                       key={listing._id}
                       className="hover:bg-gray-700/30 transition-colors cursor-pointer"
-                      onClick={() =>
-                        navigate(`/seller/listing/${listing._id}/bids`)
-                      }
+                      onClick={() => {
+                        if (
+                          listing.status === "sold" ||
+                          listing.status === "bidding_closed"
+                        ) {
+                          navigate(`/seller/listing/${listing._id}`);
+                        } else {
+                          navigate(`/seller/listing/${listing._id}/bids`);
+                        }
+                      }}
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-3">
@@ -206,39 +275,35 @@ export default function SellerDashboard() {
                               {listing.title}
                             </p>
                             <p className="text-gray-400 text-xs">
-                              Batch #{listing._id.slice(-4)}
+                              {listing.finalWeight} kg
                             </p>
                           </div>
                         </div>
                       </td>
+
                       <td className="p-4">
-                        <span className="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">
+                        <span className="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs capitalize">
                           {listing.category}
                         </span>
                       </td>
                       <td className="p-4 text-gray-400 text-sm">
                         {new Date(listing.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="p-4">
-                        <span
-                          className={`px-2 py-1 rounded text-xs font-medium ${
-                            listing.status === "active"
-                              ? "bg-green-500/20 text-green-400"
-                              : "bg-gray-700 text-gray-400"
-                          }`}
-                        >
-                          {listing.status === "active"
-                            ? "Bidding Live"
-                            : listing.status}
-                        </span>
-                      </td>
-                      <td className="p-4 text-right text-white font-semibold">
-                        $
-                        {(
-                          listing.currentHighestBid ||
-                          listing.finalValue ||
-                          0
-                        ).toFixed(2)}
+                      <td className="p-4">{getStatusBadge(listing.status)}</td>
+                      <td className="p-4 text-right">
+                        <p className="text-white font-semibold text-lg">
+                          $
+                          {(
+                            listing.currentHighestBid ||
+                            listing.finalValue ||
+                            0
+                          ).toFixed(2)}
+                        </p>
+                        <p className="text-gray-400 text-xs">
+                          {listing.status === "sold"
+                            ? "Final Price"
+                            : "Est. Value"}
+                        </p>
                       </td>
                     </tr>
                   ))}
