@@ -12,6 +12,10 @@ interface User {
   accountType?: string;
   createdAt: string;
   updatedAt: string;
+  rating?: {
+    average: number;
+    totalReviews: number;
+  };
 }
 
 interface AuthState {

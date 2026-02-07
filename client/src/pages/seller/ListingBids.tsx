@@ -192,16 +192,18 @@ export default function ListingBids() {
                 )}
 
                 <div className="mt-6 flex justify-end gap-3 border-t border-gray-700 pt-4">
-                  {bid.status === "pending" && listing.status === "active" && (
-                    <Button
-                      onClick={() => acceptBid(bid._id)}
-                      disabled={isAccepting}
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      <Check className="mr-2" size={16} />
-                      Accept Bid
-                    </Button>
-                  )}
+                  {bid.status === "pending" &&
+                    (listing.status === "active" ||
+                      listing.status === "bidding_closed") && (
+                      <Button
+                        onClick={() => acceptBid(bid._id)}
+                        disabled={isAccepting}
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <Check className="mr-2" size={16} />
+                        Accept Bid
+                      </Button>
+                    )}
                   {bid.status === "accepted" && (
                     <div className="flex items-center text-green-400 font-medium">
                       <Check className="mr-2" size={16} />

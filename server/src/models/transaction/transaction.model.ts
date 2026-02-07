@@ -153,7 +153,7 @@ const transactionSchema = new mongoose.Schema<TransactionDocument>(
 
 transactionSchema.index({ sellerId: 1, status: 1 });
 transactionSchema.index({ buyerId: 1, status: 1 });
-transactionSchema.index({ listingId: 1 });
+// listingId index is already defined in schema
 transactionSchema.index({ status: 1, scheduledPickupDate: 1 });
 
 const TransactionModel = mongoose.model<TransactionDocument>(

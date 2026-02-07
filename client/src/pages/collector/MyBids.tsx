@@ -27,14 +27,17 @@ export default function MyBids() {
   const bids = Array.isArray(bidsData) ? bidsData : [];
 
   const filteredBids = bids.filter((bid: any) => {
+    // Safety check for missing listing data
+    if (!bid.listingId) return false;
+
     if (activeTab === "active")
-      return bid.status === "pending" && bid.listingId?.status === "active";
+      return bid.status === "pending" && bid.listingId.status === "active";
     if (activeTab === "won") return bid.status === "accepted";
     if (activeTab === "lost")
       return (
         bid.status === "rejected" ||
         bid.status === "withdrawn" ||
-        (bid.status === "pending" && bid.listingId?.status !== "active")
+        (bid.status === "pending" && bid.listingId.status !== "active")
       );
     return false;
   });
@@ -103,10 +106,8 @@ export default function MyBids() {
                     : "border-gray-700"
                 } hover:border-gray-600 transition-colors cursor-pointer`}
                 onClick={() => {
-                  if (bid.listingId?.status === "active") {
-                    // Navigate to map/listing view - assuming there's a way or just generic view
-                    // Ideally we open the map with this listing focused, but we might not have a direct link yet.
-                    // For now, let's leave it non-interactive or link to general map if possible.
+                  if (bid.listingId?._id) {
+                    navigate(`/collector/auctions/${bid.listingId._id}`);
                   }
                 }}
               >

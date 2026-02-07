@@ -64,6 +64,7 @@ const createListingSchema = z.object({
 
   minimumBid: z.number().optional(),
   availableUntil: z.string().optional(),
+  biddingDeadline: z.string().optional(),
   notes: z.string().optional(),
 
   status: z.enum(["draft", "active"]).default("active"),
@@ -211,14 +212,19 @@ export const listingController = {
   }),
 
   //* Get the listing by id
+
   getListingById: catchErrors(async (req, res) => {
     const { id } = req.params;
 
-    const listing = await ListingModel.findById(id).populate(
-      "sellerId",
-      "firstName lastName email phoneNumber rating accountType",
-    );
-    // .populate("acceptedBuyerId", "firstName lastName rating accountType");
+    const listing = await ListingModel.findById(id)
+      .populate(
+        "sellerId",
+        "firstName lastName email phoneNumber rating accountType",
+      )
+      .populate(
+        "acceptedBuyerId",
+        "firstName lastName email phoneNumber rating address accountType",
+      );
 
     appAssert(listing, NOT_FOUND, "Listing not found");
 

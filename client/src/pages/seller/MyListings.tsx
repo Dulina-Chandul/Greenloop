@@ -1,9 +1,58 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { Plus, Clock, DollarSign, Eye, Hammer } from "lucide-react";
+import {
+  Plus,
+  Clock,
+  DollarSign,
+  Eye,
+  Hammer,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+  XCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/config/api/axiosInstance";
+
+const STATUS_CONFIG = {
+  active: {
+    label: "BIDDING LIVE",
+    color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/50",
+    icon: Clock,
+    dotColor: "bg-emerald-400",
+  },
+  sold: {
+    label: "SOLD",
+    color: "bg-blue-500/20 text-blue-400 border-blue-500/50",
+    icon: CheckCircle2,
+    dotColor: "bg-blue-400",
+  },
+  bidding_closed: {
+    label: "PENDING PICKUP",
+    color: "bg-amber-500/20 text-amber-400 border-amber-500/50",
+    icon: AlertCircle,
+    dotColor: "bg-amber-400",
+  },
+  draft: {
+    label: "ANALYZING",
+    color: "bg-purple-500/20 text-purple-400 border-purple-500/50",
+    icon: Sparkles,
+    dotColor: "bg-purple-400",
+  },
+  cancelled: {
+    label: "CANCELLED",
+    color: "bg-red-500/20 text-red-400 border-red-500/50",
+    icon: XCircle,
+    dotColor: "bg-red-400",
+  },
+  expired: {
+    label: "EXPIRED",
+    color: "bg-gray-500/20 text-gray-400 border-gray-500/50",
+    icon: XCircle,
+    dotColor: "bg-gray-400",
+  },
+};
 
 export default function MyListings() {
   const navigate = useNavigate();
@@ -40,23 +89,20 @@ export default function MyListings() {
   });
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active":
-        return {
-          text: "LIVE AUCTION",
-          color: "bg-green-500/20 text-green-400 border-green-500",
-        };
-      case "draft":
-        return {
-          text: "ANALYZING",
-          color: "bg-blue-500/20 text-blue-400 border-blue-500",
-        };
-      default:
-        return {
-          text: status.toUpperCase(),
-          color: "bg-gray-500/20 text-gray-400 border-gray-500",
-        };
-    }
+    const config =
+      STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] ||
+      STATUS_CONFIG.draft;
+
+    return (
+      <span
+        className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${config.color} flex items-center gap-1.5 w-fit bg-gray-900/80 backdrop-blur-sm`}
+      >
+        <span
+          className={`w-2 h-2 rounded-full ${config.dotColor} ${status === "active" ? "animate-pulse" : ""}`}
+        />
+        {config.label}
+      </span>
+    );
   };
 
   const getTimeRemaining = (deadline?: string) => {
@@ -144,7 +190,6 @@ export default function MyListings() {
         {/* Listings Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredListings.map((listing: any) => {
-            const badge = getStatusBadge(listing.status);
             const timeLeft = getTimeRemaining(listing.biddingDeadline);
 
             return (
@@ -160,11 +205,7 @@ export default function MyListings() {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-3 left-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold border ${badge.color}`}
-                    >
-                      {badge.text}
-                    </span>
+                    {getStatusBadge(listing.status)}
                   </div>
                   {timeLeft && listing.status === "active" && (
                     <div className="absolute top-3 right-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">

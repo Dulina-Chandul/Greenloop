@@ -40,70 +40,95 @@ export const bidController = {
       "Listing is not active",
     );
 
-    // Check if collector already has a bid on this listing
-    const existingBid = await BidModel.findOne({
+    // Check if collector already has a bid on this listing (any status)
+    let bid = await BidModel.findOne({
       listingId: data.listingId,
       bidderId: collectorId,
-      status: { $in: ["pending", "accepted"] },
     });
-    appAssert(
-      !existingBid,
-      BAD_REQUEST,
-      "You already have an active bid on this listing",
-    );
 
-    // Get collector info
-    const collector = await CollectorModel.findById(collectorId);
-    appAssert(collector, NOT_FOUND, "Collector not found");
+    if (bid) {
+      // If bid exists, check status
+      if (bid.status === "pending" || bid.status === "accepted") {
+        appAssert(
+          false,
+          BAD_REQUEST,
+          "You already have an active bid on this listing",
+        );
+      }
 
-    // Calculate distance (simplified - you may want to use a proper distance calculation)
-    const calculateDistance = (
-      lat1: number,
-      lon1: number,
-      lat2: number,
-      lon2: number,
-    ): number => {
-      const R = 6371; // Earth's radius in km
-      const dLat = ((lat2 - lat1) * Math.PI) / 180;
-      const dLon = ((lon2 - lon1) * Math.PI) / 180;
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos((lat1 * Math.PI) / 180) *
-          Math.cos((lat2 * Math.PI) / 180) *
-          Math.sin(dLon / 2) *
-          Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c;
-    };
+      // If bid was withdrawn or rejected, we can update it to pending
+      bid.amount = data.amount;
+      bid.message = data.message;
+      bid.proposedPickupDate = data.proposedPickupDate
+        ? new Date(data.proposedPickupDate)
+        : undefined;
+      bid.proposedPickupTime = data.proposedPickupTime;
+      bid.hasOwnTransport = data.hasOwnTransport;
+      bid.status = "pending";
+      bid.isHighestBid = false; // Will be checked later
+      // Update collector info in case it changed
+      // ... (optional, but good practice)
+    } else {
+      // Get collector info
+      const collector = await CollectorModel.findById(collectorId);
+      appAssert(collector, NOT_FOUND, "Collector not found");
 
-    // Get collector's location (you'll need to pass this from frontend)
-    const collectorLocation = req.body.collectorLocation || { lat: 0, lng: 0 };
-    const [listingLng, listingLat] = listing.location.coordinates;
+      // Calculate distance (simplified - you may want to use a proper distance calculation)
+      const calculateDistance = (
+        lat1: number,
+        lon1: number,
+        lat2: number,
+        lon2: number,
+      ): number => {
+        const R = 6371; // Earth's radius in km
+        const dLat = ((lat2 - lat1) * Math.PI) / 180;
+        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos((lat1 * Math.PI) / 180) *
+            Math.cos((lat2 * Math.PI) / 180) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+      };
 
-    const distance = calculateDistance(
-      collectorLocation.lat,
-      collectorLocation.lng,
-      listingLat ?? 0,
-      listingLng ?? 0,
-    );
+      // Get collector's location (you'll need to pass this from frontend)
+      const collectorLocation = req.body.collectorLocation || {
+        lat: 0,
+        lng: 0,
+      };
+      const [listingLng, listingLat] = listing.location.coordinates;
 
-    // Create bid
-    const bid = await (BidModel as any).create({
-      listingId: data.listingId,
-      bidderId: collectorId,
-      amount: data.amount,
-      message: data.message,
-      collectorInfo: {
-        name: `${collector.firstName} ${collector.lastName}`,
-        rating: collector.rating.average,
-        distance: distance,
-        completedJobs: collector.stats.completedTransactions,
-      },
-      proposedPickupDate: data.proposedPickupDate,
-      proposedPickupTime: data.proposedPickupTime,
-      hasOwnTransport: data.hasOwnTransport,
-      status: "pending",
-    });
+      const distance = calculateDistance(
+        collectorLocation.lat,
+        collectorLocation.lng,
+        listingLat ?? 0,
+        listingLng ?? 0,
+      );
+
+      // Create bid
+      bid = await (BidModel as any).create({
+        listingId: data.listingId,
+        bidderId: collectorId,
+        amount: data.amount,
+        message: data.message,
+        collectorInfo: {
+          name: `${collector.firstName} ${collector.lastName}`,
+          rating: collector.rating.average,
+          distance: distance,
+          completedJobs: collector.stats.completedTransactions,
+        },
+        proposedPickupDate: data.proposedPickupDate,
+        proposedPickupTime: data.proposedPickupTime,
+        hasOwnTransport: data.hasOwnTransport,
+        status: "pending",
+      });
+    }
+
+    if (!bid) {
+      throw new Error("Failed to create or update bid");
+    }
 
     // Update listing with new bid count and highest bid
     const wasHighestBid =
@@ -112,7 +137,11 @@ export const bidController = {
     if (wasHighestBid) {
       // Mark previous highest bid as not highest
       await BidModel.updateMany(
-        { listingId: data.listingId, isHighestBid: true },
+        {
+          listingId: data.listingId,
+          isHighestBid: true,
+          _id: { $ne: bid._id },
+        },
         { isHighestBid: false },
       );
 
@@ -121,8 +150,13 @@ export const bidController = {
       await bid.save();
 
       listing.currentHighestBid = data.amount;
+    } else {
+      await bid.save();
     }
 
+    // Only increment totalBids if it's a NEW bid or if logic requires total interaction count.
+    // If reactivating, we should probably increment totalBids again if we decremented it on withdraw.
+    // withdrawBid decrements totalBids. So yes, increment it here.
     listing.totalBids += 1;
     await listing.save();
 
@@ -316,9 +350,9 @@ export const bidController = {
       "You can only accept bids on your own listings",
     );
     appAssert(
-      listing.status === "active",
+      listing.status === "active" || listing.status === "bidding_closed",
       BAD_REQUEST,
-      "Listing is not active",
+      "Listing is not active or awaiting winner selection",
     );
 
     // Update bid status
@@ -327,7 +361,7 @@ export const bidController = {
     await bid.save();
 
     // Update listing
-    listing.status = "sold";
+    listing.status = "bidding_closed";
     listing.acceptedBidId = bid._id as any;
     listing.acceptedBuyerId = bid.bidderId;
     listing.closedAt = new Date();

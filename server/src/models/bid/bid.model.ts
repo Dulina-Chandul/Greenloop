@@ -6,7 +6,7 @@ export interface BidDocument extends mongoose.Document {
   bidderId: mongoose.Types.ObjectId;
 
   amount: number;
-  message?: string;
+  message?: string | undefined;
 
   collectorInfo: {
     name: string;
@@ -15,10 +15,10 @@ export interface BidDocument extends mongoose.Document {
     completedJobs: number;
   };
 
-  isHighestBid?: boolean;
+  isHighestBid?: boolean | undefined;
 
-  proposedPickupDate?: Date;
-  proposedPickupTime?: string;
+  proposedPickupDate?: Date | undefined;
+  proposedPickupTime?: string | undefined;
   hasOwnTransport: boolean;
   status: "pending" | "accepted" | "rejected" | "withdrawn" | "expired";
 

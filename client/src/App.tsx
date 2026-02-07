@@ -21,6 +21,8 @@ import MyListings from "./pages/seller/MyListings";
 import ListingBids from "./pages/seller/ListingBids";
 import MyBids from "./pages/collector/MyBids";
 import Earnings from "./pages/common/Earnings";
+import ListingDetails from "./pages/seller/ListingDetails";
+import SellerEarnings from "./pages/seller/SellerEarnings";
 // import './App.css'
 
 function App() {
@@ -35,7 +37,6 @@ function App() {
       <Route path="/email/verify/:code" element={<VerifyEmail />} />
       <Route path="/password/forgot" element={<ForgotPassword />} />
       <Route path="/password/reset" element={<ResetPassword />} />
-
       <Route
         path="/seller/dashboard"
         element={
@@ -86,12 +87,32 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route
+      {/* <Route
         path="/seller/listing/:id"
         element={
           <ProtectedRoute allowedRoles={["seller"]}>
             <SellerLayout>
               <ListingBids />
+            </SellerLayout>
+          </ProtectedRoute>
+        }
+      /> */}
+      <Route
+        path="/seller/listing/:id"
+        element={
+          <ProtectedRoute allowedRoles={["seller"]}>
+            <SellerLayout>
+              <ListingDetails />
+            </SellerLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/seller/earnings"
+        element={
+          <ProtectedRoute allowedRoles={["seller"]}>
+            <SellerLayout>
+              <SellerEarnings />
             </SellerLayout>
           </ProtectedRoute>
         }
@@ -106,17 +127,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/seller/earnings"
-        element={
-          <ProtectedRoute allowedRoles={["seller"]}>
-            <SellerLayout>
-              <Earnings role="seller" />
-            </SellerLayout>
-          </ProtectedRoute>
-        }
-      />
-
       <Route
         path="/collector/dashboard"
         element={
@@ -148,6 +158,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/collector/profile"
         element={
@@ -190,7 +201,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/seller/listing/:id/bids"
         element={
@@ -201,7 +211,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/dashboard"
         element={
@@ -212,7 +221,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/unauthorized"
         element={
@@ -234,7 +242,6 @@ function App() {
           </div>
         }
       />
-
       <Route
         path="/"
         element={
@@ -266,7 +273,6 @@ function App() {
           </div>
         }
       />
-
       <Route
         path="*"
         element={

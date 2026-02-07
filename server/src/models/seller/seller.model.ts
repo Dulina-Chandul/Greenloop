@@ -245,8 +245,8 @@ const sellerSchema = new mongoose.Schema<SellerDocument>(
 );
 
 // sellerSchema.index({ location: "2dsphere" });
-sellerSchema.index({ email: 1 }, { unique: true });
-sellerSchema.index({ phoneNumber: 1 }, { unique: true });
+// sellerSchema.index({ email: 1 }, { unique: true }); // Already unique in schema
+// sellerSchema.index({ phoneNumber: 1 }, { unique: true }); // Already unique in schema
 sellerSchema.index({ accountStatus: 1 });
 sellerSchema.index({ "rating.average": -1 });
 sellerSchema.index({ accountType: 1 });

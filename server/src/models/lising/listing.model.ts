@@ -284,21 +284,14 @@ const listingSchema = new mongoose.Schema<ListingDocument>(
   },
 );
 
-listingSchema.index({ location: "2dsphere" });
-listingSchema.index({ status: 1, createdAt: -1 });
-listingSchema.index({ sellerId: 1, status: 1 });
-listingSchema.index({ category: 1, status: 1 });
-listingSchema.index({ currentHighestBid: -1 });
-
-listingSchema.pre("save", function () {
+// Calculate final values
+listingSchema.pre("save", function (next) {
   if (this.manualOverrides?.isManuallyEdited) {
     this.finalWeight =
       this.manualOverrides.weight || this.aiAnalysis.totalEstimatedWeight;
     this.finalMaterials =
       this.manualOverrides.materials ||
       this.aiAnalysis.detectedMaterials.map((m) => m.materialType);
-
-    //TODO : chage the price calculating process
     this.finalValue = this.finalWeight * 50;
   } else {
     this.finalWeight = this.aiAnalysis.totalEstimatedWeight;
@@ -308,6 +301,12 @@ listingSchema.pre("save", function () {
     this.finalValue = this.aiAnalysis.totalEstimatedValue;
   }
 });
+
+listingSchema.index({ location: "2dsphere" });
+listingSchema.index({ status: 1, createdAt: -1 });
+listingSchema.index({ sellerId: 1, status: 1 });
+listingSchema.index({ category: 1, status: 1 });
+listingSchema.index({ currentHighestBid: -1 });
 
 const ListingModel = mongoose.model<ListingDocument>("Listing", listingSchema);
 export default ListingModel;

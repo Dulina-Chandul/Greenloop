@@ -338,8 +338,8 @@ const collectorSchema = new mongoose.Schema<CollectorDocument>(
 );
 
 // collectorSchema.index({ location: "2dsphere" });
-collectorSchema.index({ email: 1 }, { unique: true });
-collectorSchema.index({ phoneNumber: 1 }, { unique: true });
+// collectorSchema.index({ email: 1 }, { unique: true }); // Already unique in schema
+// collectorSchema.index({ phoneNumber: 1 }, { unique: true }); // Already unique in schema
 collectorSchema.index({ accountStatus: 1, isVerifiedCollector: 1 });
 collectorSchema.index({ "rating.average": -1 });
 collectorSchema.index({ acceptedMaterials: 1 });

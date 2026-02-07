@@ -112,6 +112,8 @@ interface Listing {
     rating: { average: number };
   };
   currentHighestBid?: number;
+  biddingDeadline?: string;
+  totalBids?: number;
 }
 
 function MapController({ center }: { center: [number, number] }) {
@@ -506,7 +508,7 @@ function ListingDetailsModal({
       // actually the interface Listing doesn't have biddingDeadline. Let's add it to interface or check backend.
       // listing.model.ts has biddingDeadline. Listing interface in this file needs it.
       // Casting listing to any to access biddingDeadline for now to avoid TS error if I can't change interface easily here.
-      const deadline = (listing as any).biddingDeadline;
+      const deadline = listing.biddingDeadline;
       if (!deadline) {
         setTimeLeft("No Deadline");
         return;
@@ -597,7 +599,9 @@ function ListingDetailsModal({
             </div>
             <div className="text-right">
               <div className="text-sm text-gray-400 mb-1">Total Bidders</div>
-              <div className="text-xl font-bold text-white">3</div>
+              <div className="text-xl font-bold text-white">
+                {listing.totalBids || 0}
+              </div>
             </div>
           </div>
 
