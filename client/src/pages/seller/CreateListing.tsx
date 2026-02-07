@@ -35,6 +35,7 @@ export default function CreateListing() {
   const [weight, setWeight] = useState<number>(0);
   const [price, setPrice] = useState<number>(0);
   const [materials, setMaterials] = useState<string[]>([]);
+  const [deadlineHours, setDeadlineHours] = useState<number>(24);
 
   // Upload & Analyze
   const { mutate: analyzeImage, isPending: isAnalyzing } = useMutation({
@@ -131,6 +132,9 @@ export default function CreateListing() {
           weight,
           materials,
         },
+        biddingDeadline: new Date(
+          Date.now() + deadlineHours * 60 * 60 * 1000,
+        ).toISOString(),
         status: "active" as const,
       };
 
@@ -142,9 +146,6 @@ export default function CreateListing() {
     },
     onSuccess: () => {
       setStep(3);
-      setTimeout(() => {
-        navigate("/seller/dashboard");
-      }, 2000);
     },
     onError: (error: any) => {
       console.error("Error creating listing:", error);
@@ -361,6 +362,24 @@ export default function CreateListing() {
                 </div>
               </div>
 
+              <div>
+                <Label htmlFor="deadline" className="text-gray-300">
+                  Bidding Deadline
+                </Label>
+                <select
+                  id="deadline"
+                  value={deadlineHours}
+                  onChange={(e) => setDeadlineHours(parseInt(e.target.value))}
+                  className="mt-2 w-full bg-gray-700 border-gray-600 text-white rounded-md p-2"
+                >
+                  <option value={6}>6 Hours</option>
+                  <option value={12}>12 Hours</option>
+                  <option value={24}>24 Hours (1 Day)</option>
+                  <option value={48}>48 Hours (2 Days)</option>
+                  <option value={72}>72 Hours (3 Days)</option>
+                </select>
+              </div>
+
               <div className="bg-gray-700 rounded-lg p-4">
                 <h4 className="text-sm font-medium text-gray-300 mb-3">
                   Preview
@@ -427,11 +446,17 @@ export default function CreateListing() {
         <p className="text-gray-400 mb-4">
           Your listing is now live and collectors can see it on the map.
         </p>
-        <div className="bg-gray-700 rounded-lg p-4 mb-4">
+        <div className="bg-gray-700 rounded-lg p-4 mb-6">
           <p className="text-sm text-gray-400">Expected bids within</p>
           <p className="text-2xl font-bold text-green-400">2-4 hours</p>
         </div>
-        <p className="text-xs text-gray-500">Redirecting to dashboard...</p>
+
+        <Button
+          onClick={() => navigate("/seller/dashboard")}
+          className="w-full bg-green-600 hover:bg-green-700 h-12 text-lg font-semibold"
+        >
+          Go to Dashboard
+        </Button>
       </div>
     </div>
   );

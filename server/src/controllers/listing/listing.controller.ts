@@ -64,6 +64,7 @@ const createListingSchema = z.object({
 
   minimumBid: z.number().optional(),
   availableUntil: z.string().optional(),
+  biddingDeadline: z.string().optional(),
   notes: z.string().optional(),
 
   status: z.enum(["draft", "active"]).default("active"),

@@ -22,7 +22,10 @@ import { Switch } from "@/components/ui/switch";
 export default function CollectorDashboard() {
   const user = useAppSelector(selectUser);
   const navigate = useNavigate();
-  const [isLiveTracking, setIsLiveTracking] = useState(false);
+  const [isLiveTracking, setIsLiveTracking] = useState(() => {
+    const saved = localStorage.getItem("isLiveTracking");
+    return saved === "true";
+  });
   const socketRef = useRef<Socket | null>(null);
   const [manualLocation, setManualLocation] = useState<{
     lat: number;
@@ -30,10 +33,15 @@ export default function CollectorDashboard() {
   } | null>(null);
   const [useManualLocation, setUseManualLocation] = useState(false);
 
+  // Persist live tracking state
+  useEffect(() => {
+    localStorage.setItem("isLiveTracking", isLiveTracking.toString());
+  }, [isLiveTracking]);
+
   // Use high-accuracy geolocation for vehicle tracking
   const { location, error: geoError } = useGeolocation(isLiveTracking, {
     enableHighAccuracy: true,
-    timeout: 5000,
+    timeout: 20000,
     maximumAge: 0,
   });
 
@@ -149,10 +157,12 @@ export default function CollectorDashboard() {
     },
     {
       label: "Rating",
-      value: "4.8",
+      value: user?.rating?.average?.toFixed(1) || "N/A",
       icon: Award,
       color: "bg-yellow-500",
-      change: "Top 10% collectors",
+      change: user?.rating?.totalReviews
+        ? `${user.rating.totalReviews} reviews`
+        : "No reviews yet",
     },
   ];
 
