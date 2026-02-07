@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/config/api/axiosInstance";
+import { formatCurrency } from "@/config/currency";
+import { useAppSelector } from "@/redux/hooks/hooks";
+import { selectUser } from "@/redux/slices/authSlice";
 
 const STATUS_CONFIG = {
   active: {
@@ -56,10 +59,11 @@ const STATUS_CONFIG = {
 
 export default function MyListings() {
   const navigate = useNavigate();
+  const user = useAppSelector(selectUser);
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<"active" | "pending" | "sold">(
-    "active",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "active" | "pending" | "sold" | "expired"
+  >("active");
 
   // Fetch seller listings
   const { data: listingsData, isLoading } = useQuery({
@@ -81,10 +85,12 @@ export default function MyListings() {
   });
 
   const listings = listingsData || [];
+
   const filteredListings = listings.filter((listing: any) => {
     if (activeTab === "active") return listing.status === "active";
     if (activeTab === "pending") return listing.status === "bidding_closed";
     if (activeTab === "sold") return listing.status === "sold";
+    if (activeTab === "expired") return listing.status === "expired";
     return false;
   });
 
@@ -166,6 +172,11 @@ export default function MyListings() {
               label: "Sold History",
               count: listings.filter((l: any) => l.status === "sold").length,
             },
+            {
+              key: "expired",
+              label: "Expired / Ended",
+              count: listings.filter((l: any) => l.status === "expired").length,
+            },
           ].map((tab) => (
             <button
               key={tab.key}
@@ -237,13 +248,11 @@ export default function MyListings() {
                           ? "Current Bid"
                           : "Est. Value"}
                       </p>
-                      <p className="text-xl font-bold text-white">
-                        $
-                        {(
-                          listing.currentHighestBid ||
-                          listing.finalValue ||
-                          0
-                        ).toFixed(2)}
+                      <p className="font-semibold text-white">
+                        {formatCurrency(
+                          listing.currentHighestBid || listing.finalValue || 0,
+                          user?.currency,
+                        )}
                         <span className="text-sm text-gray-400 ml-1">/kg</span>
                       </p>
                     </div>
@@ -262,7 +271,8 @@ export default function MyListings() {
                   </div>
 
                   {/* Actions */}
-                  {listing.status === "active" ? (
+                  {listing.status === "active" ||
+                  listing.status === "expired" ? (
                     <Button
                       onClick={() =>
                         navigate(`/seller/listing/${listing._id}/bids`)

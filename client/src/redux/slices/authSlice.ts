@@ -16,6 +16,7 @@ interface User {
     average: number;
     totalReviews: number;
   };
+  currency?: string;
 }
 
 interface AuthState {

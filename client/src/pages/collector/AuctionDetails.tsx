@@ -11,6 +11,7 @@ import {
   Scale,
   User,
   X,
+  CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,7 @@ import { createBidAPI, getListingBidsAPI } from "@/apiservices/bid/bidAPI";
 import { io, Socket } from "socket.io-client";
 import { useAppSelector } from "@/redux/hooks/hooks";
 import { selectUser } from "@/redux/slices/authSlice";
+import { formatCurrency } from "@/config/currency";
 
 import { useLocation } from "react-router";
 
@@ -31,6 +33,7 @@ export default function AuctionDetails() {
 
   const [bidAmount, setBidAmount] = useState<number>(0);
   const [timeLeft, setTimeLeft] = useState<string>("");
+  const [progress, setProgress] = useState<number>(0);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -182,6 +185,19 @@ export default function AuctionDetails() {
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
       setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
+
+      // Calculate progress
+      if (listing.createdAt && listing.biddingDeadline) {
+        const totalDuration =
+          new Date(listing.biddingDeadline).getTime() -
+          new Date(listing.createdAt).getTime();
+        const elapsed = now - new Date(listing.createdAt).getTime();
+        const calculatedProgress = Math.min(
+          100,
+          Math.max(0, (elapsed / totalDuration) * 100),
+        );
+        setProgress(calculatedProgress);
+      }
     };
 
     calculateTimeLeft();
@@ -309,7 +325,7 @@ export default function AuctionDetails() {
         <div className="max-w-7xl mx-auto">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-gray-400 hover:text-white mb-4"
+            className="flex items-center gap-2 text-gray-400 hover:text-green-400 hover:bg-transparent mb-4 transition-colors"
           >
             <ArrowLeft size={20} />
             Back to Auctions
@@ -445,7 +461,7 @@ export default function AuctionDetails() {
                       <p
                         className={`font-bold ${index === 0 ? "text-green-400 text-lg" : "text-white"}`}
                       >
-                        ${bid.amount.toFixed(2)}
+                        {formatCurrency(bid.amount, user?.currency)}
                       </p>
                       {index === 0 && (
                         <span className="text-green-400 text-xs">
@@ -508,7 +524,10 @@ export default function AuctionDetails() {
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <TrendingUp className="text-green-400" size={24} />
                   <p className="text-4xl font-bold text-white">
-                    ${(listing.currentHighestBid || 0).toFixed(2)}
+                    {formatCurrency(
+                      listing.currentHighestBid || 0,
+                      user?.currency,
+                    )}
                   </p>
                 </div>
                 <span className="text-xs text-gray-400">
@@ -516,77 +535,127 @@ export default function AuctionDetails() {
                 </span>
               </div>
 
-              {/* Bid Input */}
-              <div className="mb-4">
-                <Input
-                  type="number"
-                  value={bidAmount}
-                  onChange={(e) => setBidAmount(parseFloat(e.target.value))}
-                  placeholder="Enter your bid"
-                  step="0.1"
-                  min={(listing.currentHighestBid || 0) + 0.1}
-                  className="bg-gray-700 border-green-600 border-2 text-white text-xl h-14 text-center"
-                />
-              </div>
+              {/* Winner Display */}
+              {(listing.status === "bidding_closed" ||
+                listing.status === "sold") &&
+              listing.acceptedBuyerId ? (
+                <div className="bg-green-900/30 border border-green-500 rounded-lg p-6 mb-6 text-center">
+                  <div className="w-16 h-16 bg-green-900 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-green-500">
+                    <CheckCircle className="text-green-400" size={32} />
+                  </div>
+                  <p className="text-green-400 font-bold text-lg mb-1">
+                    AUCTION ENDED
+                  </p>
+                  <p className="text-white text-sm mb-4">
+                    Winner:{" "}
+                    <span className="font-semibold text-green-300">
+                      {listing.acceptedBuyerId.firstName}{" "}
+                      {listing.acceptedBuyerId.lastName}
+                    </span>
+                  </p>
+                  <div className="bg-gray-800 rounded p-3 inline-block">
+                    <p className="text-xs text-gray-400 uppercase">
+                      Winning Bid
+                    </p>
+                    <p className="text-xl font-bold text-white">
+                      {formatCurrency(
+                        bids.find((b: any) => b.status === "accepted")
+                          ?.amount ||
+                          listing.currentHighestBid ||
+                          0,
+                        user?.currency,
+                      )}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* Bid Input */}
+                  <div className="mb-4">
+                    <Input
+                      type="number"
+                      value={bidAmount}
+                      onChange={(e) => setBidAmount(parseFloat(e.target.value))}
+                      placeholder="Enter your bid"
+                      step="0.1"
+                      min={(listing.currentHighestBid || 0) + 0.1}
+                      className="bg-gray-700 border-green-600 border-2 text-white text-xl h-14 text-center"
+                      disabled={listing.status !== "active"}
+                    />
+                  </div>
 
-              {/* Place Bid Button */}
-              <Button
-                onClick={handlePlaceBid}
-                disabled={
-                  isPending || bidAmount <= (listing.currentHighestBid || 0)
-                }
-                className="w-full bg-green-600 hover:bg-green-700 h-12 text-lg font-semibold"
-              >
-                <Hammer className="mr-2" size={20} />
-                {isPending || isUpdating
-                  ? "Processing..."
-                  : bids?.find(
-                        (b: any) =>
-                          b.bidderId._id === user?._id &&
-                          b.status === "pending",
-                      )
-                    ? "Update Bid"
-                    : "Place Bid Now"}
-              </Button>
-
-              <div className="mt-3 flex gap-2 justify-center">
-                {[0.5, 1.0, 5.0, 10.0].map((inc) => (
-                  <button
-                    key={inc}
-                    onClick={() => handleQuickBid(inc)}
-                    className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-green-400 border border-green-500/30 rounded-full text-xs transition-colors"
+                  {/* Place Bid Button */}
+                  <Button
+                    onClick={handlePlaceBid}
+                    disabled={
+                      isPending ||
+                      bidAmount <= (listing.currentHighestBid || 0) ||
+                      listing.status !== "active"
+                    }
+                    className="w-full bg-green-600 hover:bg-green-700 h-12 text-lg font-semibold"
                   >
-                    +${inc}
-                  </button>
-                ))}
-              </div>
+                    <Hammer className="mr-2" size={20} />
+                    {isPending || isUpdating
+                      ? "Processing..."
+                      : bids?.find(
+                            (b: any) =>
+                              b.bidderId._id === user?._id &&
+                              b.status === "pending",
+                          )
+                        ? "Update Bid"
+                        : "Place Bid Now"}
+                  </Button>
 
-              {bids?.find(
-                (b: any) =>
-                  b.bidderId._id === user?._id && b.status === "pending",
-              ) && (
-                <Button
-                  onClick={handleWithdrawBid}
-                  disabled={isWithdrawing}
-                  variant="outline"
-                  className="w-full mt-3 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                >
-                  Withdraw Bid
-                </Button>
+                  <div className="mt-3 flex gap-2 justify-center">
+                    {[0.5, 1.0, 5.0, 10.0].map((inc) => (
+                      <button
+                        key={inc}
+                        onClick={() => handleQuickBid(inc)}
+                        disabled={listing.status !== "active"}
+                        className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-green-400 border border-green-500/30 rounded-full text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        +{formatCurrency(inc, user?.currency)}
+                      </button>
+                    ))}
+                  </div>
+
+                  {bids?.find(
+                    (b: any) =>
+                      b.bidderId._id === user?._id && b.status === "pending",
+                  ) && (
+                    <Button
+                      onClick={handleWithdrawBid}
+                      disabled={isWithdrawing || listing.status !== "active"}
+                      variant="outline"
+                      className="w-full mt-3 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                    >
+                      Withdraw Bid
+                    </Button>
+                  )}
+                </>
               )}
 
               {/* Timer */}
               <div className="mt-6 pt-6 border-t border-gray-700">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-red-400 text-sm font-semibold">
-                    CLOSING SOON
+                    {listing.status === "active"
+                      ? "CLOSING SOON"
+                      : "AUCTION ENDED"}
                   </span>
                   <span className="text-white text-xl font-bold">
                     {timeLeft}
                   </span>
                 </div>
                 <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 w-4/5"></div>
+                  <div
+                    className={`h-full transition-all duration-1000 ease-linear ${
+                      listing.status === "active"
+                        ? "bg-gradient-to-r from-green-500 via-yellow-500 to-red-500"
+                        : "bg-gray-500"
+                    }`}
+                    style={{ width: `${progress}%` }}
+                  ></div>
                 </div>
               </div>
             </div>

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/config/api/axiosInstance";
+import { formatCurrency } from "@/config/currency";
 
 // Status configuration with distinct styling
 const STATUS_CONFIG = {
@@ -187,9 +188,9 @@ export default function SellerDashboard() {
               </span>
             </div>
             <h3 className="text-gray-400 text-sm mb-1">Total Earnings</h3>
-            <p className="text-4xl font-bold text-white">
-              ${totalEarnings.toFixed(2)}
-            </p>
+            <div className="text-2xl font-bold text-white mb-1">
+              {formatCurrency(totalEarnings, user?.currency)}
+            </div>
           </div>
         </div>
 
@@ -291,13 +292,13 @@ export default function SellerDashboard() {
                       </td>
                       <td className="p-4">{getStatusBadge(listing.status)}</td>
                       <td className="p-4 text-right">
-                        <p className="text-white font-semibold text-lg">
-                          $
-                          {(
+                        <p className="font-semibold text-white">
+                          {formatCurrency(
                             listing.currentHighestBid ||
-                            listing.finalValue ||
-                            0
-                          ).toFixed(2)}
+                              listing.finalValue ||
+                              0,
+                            user?.currency,
+                          )}
                         </p>
                         <p className="text-gray-400 text-xs">
                           {listing.status === "sold"

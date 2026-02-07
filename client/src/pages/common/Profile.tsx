@@ -1,4 +1,11 @@
-import { AlertCircle, Calendar, Mail, User } from "lucide-react";
+import {
+  AlertCircle,
+  Calendar,
+  Mail,
+  User,
+  DollarSign,
+  Save,
+} from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -10,14 +17,48 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import userAuth from "@/hooks/userAuth";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import axiosInstance from "@/config/api/axiosInstance";
+import { useState } from "react";
 
 const Profile = () => {
   const { user } = userAuth();
+  const queryClient = useQueryClient();
+  const [currency, setCurrency] = useState(user?.currency || "LKR");
+
+  const { mutate: updateProfile, isPending } = useMutation({
+    mutationFn: async (data: { currency: string }) => {
+      await axiosInstance.put("/user", data);
+    },
+    onSuccess: (_, variables) => {
+      toast.success(`Currency updated to ${variables.currency}`);
+      queryClient.invalidateQueries({ queryKey: ["user"] }); // Invalidate user query to refetch
+      // Since userAuth hook might not react immediately if it uses a different query key or context,
+      // we rely on the backend update and subsequent fetches.
+      // Ideally userAuth should use react-query too for seamless updates.
+      // Assuming userAuth uses redux or context that needs manual update or re-fetch.
+      // For now, let's assume invalidating "user" or "auth" helps if setup correctly.
+      // If userAuth is from Redux, we might need to dispatch an action.
+      // But let's proceed with just mutation for now.
+      window.location.reload(); // Simple reload to ensure all components get fresh data if Redux isn't automatically updated
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to update profile");
+    },
+  });
+
   if (!user) return null;
 
   const { email, verified, createdAt } = user;
-
-  console.log(user);
 
   return (
     <div className="flex flex-col items-center pt-16 px-4">
@@ -59,6 +100,37 @@ const Profile = () => {
               <span className="text-sm font-medium">Email</span>
             </div>
             <span className="text-sm text-gray-500">{email}</span>
+          </div>
+
+          {/* Currency Row */}
+          <div className="flex items-center justify-between rounded-lg border p-3">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full bg-green-100 p-2">
+                <DollarSign className="h-4 w-4 text-green-600" />
+              </div>
+              <span className="text-sm font-medium">Currency</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Select
+                value={currency}
+                onValueChange={(value) => {
+                  setCurrency(value);
+                  updateProfile({ currency: value });
+                }}
+                disabled={isPending}
+              >
+                <SelectTrigger className="w-[100px] h-8">
+                  <SelectValue placeholder="Currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="LKR">LKR</SelectItem>
+                  <SelectItem value="USD">USD</SelectItem>
+                  <SelectItem value="EUR">EUR</SelectItem>
+                  <SelectItem value="GBP">GBP</SelectItem>
+                  <SelectItem value="AUD">AUD</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Joined Date Row */}

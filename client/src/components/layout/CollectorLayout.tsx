@@ -4,7 +4,6 @@ import {
   LayoutGrid,
   Gavel,
   DollarSign,
-  Route as RouteIcon,
   Star,
   Settings,
   Menu,
@@ -26,8 +25,6 @@ export default function CollectorLayout({ children }: CollectorLayoutProps) {
     { icon: Gavel, label: "Auctions", path: "/collector/auctions" },
     { icon: FileText, label: "My Bids", path: "/collector/my-bids" },
     { icon: DollarSign, label: "Earnings", path: "/collector/earnings" },
-    { icon: RouteIcon, label: "Routes", path: "/collector/routes" },
-    { icon: Star, label: "Reputation", path: "/collector/reputation" },
     { icon: Settings, label: "Settings", path: "/collector/settings" },
   ];
 

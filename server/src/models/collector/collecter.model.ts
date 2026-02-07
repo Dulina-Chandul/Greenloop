@@ -74,6 +74,8 @@ export interface CollectorDocument extends mongoose.Document {
     maxAutoBidAmount?: number;
   };
 
+  currency: string;
+
   kycStatus: "pending" | "verified" | "rejected";
   kycDocuments?: string[];
 
@@ -301,6 +303,11 @@ const collectorSchema = new mongoose.Schema<CollectorDocument>(
         default: false,
       },
       maxAutoBidAmount: Number,
+    },
+
+    currency: {
+      type: String,
+      default: "LKR",
     },
 
     kycStatus: {

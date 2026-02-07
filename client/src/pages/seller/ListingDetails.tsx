@@ -1,5 +1,7 @@
 import { useParams, useNavigate } from "react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useAppSelector } from "@/redux/hooks/hooks";
+import { selectUser } from "@/redux/slices/authSlice";
 import {
   ArrowLeft,
   Phone,
@@ -16,10 +18,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axiosInstance from "@/config/api/axiosInstance";
+import { formatCurrency } from "@/config/currency";
 
 export default function ListingDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const user = useAppSelector(selectUser);
 
   const { data: listingData, isLoading } = useQuery({
     queryKey: ["listing-detail", id],
@@ -97,7 +101,7 @@ export default function ListingDetails() {
         <Button
           variant="ghost"
           onClick={() => navigate("/seller/listings")}
-          className="mb-6 text-gray-400 hover:text-white pl-0"
+          className="mb-6 text-gray-400 hover:text-green-400 hover:bg-transparent pl-0"
         >
           <ArrowLeft className="mr-2" size={20} />
           Back to Listings
@@ -139,12 +143,10 @@ export default function ListingDetails() {
                   <div className="text-right">
                     <p className="text-sm text-gray-400 mb-1">Final Price</p>
                     <p className="text-3xl font-bold text-green-400">
-                      $
-                      {(
-                        listing.currentHighestBid ||
-                        listing.finalValue ||
-                        0
-                      ).toFixed(2)}
+                      {formatCurrency(
+                        listing.currentHighestBid || listing.finalValue || 0,
+                        user?.currency,
+                      )}
                     </p>
                   </div>
                 </div>

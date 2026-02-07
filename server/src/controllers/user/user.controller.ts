@@ -20,3 +20,26 @@ export const getUserHandler = catchErrors(async (req, res) => {
     return res.status(OK).json({ user: user.omitPassword() });
   }
 });
+
+export const updateUserHandler = catchErrors(async (req, res) => {
+  const updates = req.body;
+  let user;
+
+  if (req.userRole === "seller") {
+    user = await SellerModel.findByIdAndUpdate(req.userId, updates, {
+      new: true,
+    });
+  } else if (req.userRole === "collector") {
+    user = await CollectorModel.findByIdAndUpdate(req.userId, updates, {
+      new: true,
+    });
+  } else if (req.userRole === "user") {
+    user = await UserModel.findByIdAndUpdate(req.userId, updates, {
+      new: true,
+    });
+  }
+
+  appAssert(user, NOT_FOUND, "User not found");
+
+  return res.status(OK).json({ user: user.omitPassword() });
+});

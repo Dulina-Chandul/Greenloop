@@ -6,6 +6,7 @@ export interface UserDocument extends mongoose.Document {
   email: string;
   password: string;
   verified: boolean;
+  currency: string;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(val: string): Promise<boolean>;
@@ -29,6 +30,10 @@ const userSchema = new mongoose.Schema<UserDocument>(
     verified: {
       type: Boolean,
       default: false,
+    },
+    currency: {
+      type: String,
+      default: "LKR",
     },
   },
   { timestamps: true },

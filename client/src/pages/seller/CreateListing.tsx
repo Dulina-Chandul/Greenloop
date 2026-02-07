@@ -2,11 +2,14 @@ import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import { useAppSelector } from "@/redux/hooks/hooks";
+import { selectUser } from "@/redux/slices/authSlice";
 import { Upload, Loader2, CheckCircle, Edit2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axiosInstance from "@/config/api/axiosInstance";
+import { formatCurrency } from "@/config/currency";
 
 interface AIAnalysis {
   detectedMaterials: Array<{
@@ -23,6 +26,7 @@ interface AIAnalysis {
 
 export default function CreateListing() {
   const navigate = useNavigate();
+  const user = useAppSelector(selectUser);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -36,6 +40,7 @@ export default function CreateListing() {
   const [price, setPrice] = useState<number>(0);
   const [materials, setMaterials] = useState<string[]>([]);
   const [deadlineHours, setDeadlineHours] = useState<number>(24);
+  const [customDeadline, setCustomDeadline] = useState<string>("");
 
   // Upload & Analyze
   const { mutate: analyzeImage, isPending: isAnalyzing } = useMutation({
@@ -132,9 +137,12 @@ export default function CreateListing() {
           weight,
           materials,
         },
-        biddingDeadline: new Date(
-          Date.now() + deadlineHours * 60 * 60 * 1000,
-        ).toISOString(),
+        biddingDeadline:
+          deadlineHours === 0 && customDeadline
+            ? new Date(customDeadline).toISOString()
+            : new Date(
+                Date.now() + deadlineHours * 60 * 60 * 1000,
+              ).toISOString(),
         status: "active" as const,
       };
 
@@ -349,7 +357,7 @@ export default function CreateListing() {
                     htmlFor="price"
                     className="text-gray-300 flex items-center gap-2"
                   >
-                    Estimated Value (Rs.)
+                    Estimated Value (LKR)
                     <Edit2 size={14} className="text-gray-500" />
                   </Label>
                   <Input
@@ -377,7 +385,27 @@ export default function CreateListing() {
                   <option value={24}>24 Hours (1 Day)</option>
                   <option value={48}>48 Hours (2 Days)</option>
                   <option value={72}>72 Hours (3 Days)</option>
+                  <option value={0}>Custom Date & Time</option>
                 </select>
+
+                {deadlineHours === 0 && (
+                  <div className="mt-2">
+                    <Label htmlFor="customDate" className="text-gray-300">
+                      Select End Time
+                    </Label>
+                    <Input
+                      id="customDate"
+                      type="datetime-local"
+                      className="mt-1 bg-gray-700 border-gray-600 text-white"
+                      min={new Date(
+                        Date.now() - new Date().getTimezoneOffset() * 60000,
+                      )
+                        .toISOString()
+                        .slice(0, 16)}
+                      onChange={(e) => setCustomDeadline(e.target.value)}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="bg-gray-700 rounded-lg p-4">
@@ -394,7 +422,7 @@ export default function CreateListing() {
                   <div className="flex justify-between">
                     <span className="text-gray-400">Est. Value:</span>
                     <span className="text-green-400 font-semibold">
-                      Rs. {price}
+                      {formatCurrency(price, user?.currency)}
                     </span>
                   </div>
                   <div className="flex justify-between">

@@ -4,12 +4,16 @@ import { getTransactions, confirmTransaction } from "@/lib/api/transaction";
 import { CheckCircle, Clock, DollarSign, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { formatCurrency } from "@/config/currency";
+import { useAppSelector } from "@/redux/hooks/hooks";
+import { selectUser } from "@/redux/slices/authSlice";
 
 interface EarningsProps {
   role: "seller" | "buyer"; // 'buyer' is collector in our context
 }
 
 export default function Earnings({ role }: EarningsProps) {
+  const user = useAppSelector(selectUser);
   const [activeTab, setActiveTab] = useState<"active" | "history">("active");
   const queryClient = useQueryClient();
 
@@ -92,7 +96,7 @@ export default function Earnings({ role }: EarningsProps) {
                   Total {role === "seller" ? "Earned" : "Spent"}
                 </p>
                 <p className="text-3xl font-bold text-white">
-                  ${totalAmount.toFixed(2)}
+                  {formatCurrency(totalAmount, user?.currency)}
                 </p>
               </div>
             </div>
@@ -171,7 +175,10 @@ export default function Earnings({ role }: EarningsProps) {
                     <div className="text-right">
                       <p className="text-sm text-gray-400">Amount</p>
                       <p className="text-2xl font-bold text-green-400">
-                        ${transaction.agreedPrice.toFixed(2)}
+                        {formatCurrency(
+                          transaction.agreedPrice,
+                          user?.currency,
+                        )}
                       </p>
                     </div>
 

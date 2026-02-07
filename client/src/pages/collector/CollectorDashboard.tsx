@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import useGeolocation from "@/hooks/useGeolocation";
 import { Switch } from "@/components/ui/switch";
+import { formatCurrency } from "@/config/currency";
 
 export default function CollectorDashboard() {
   const user = useAppSelector(selectUser);
@@ -150,7 +151,14 @@ export default function CollectorDashboard() {
     },
     {
       label: "Total Spent",
-      value: `$${bids.reduce((sum: number, b: any) => (b.status === "accepted" ? sum + b.amount : sum), 0).toFixed(2)}`,
+      value: formatCurrency(
+        bids.reduce(
+          (sum: number, b: any) =>
+            b.status === "accepted" ? sum + b.amount : sum,
+          0,
+        ),
+        user?.currency,
+      ),
       icon: DollarSign,
       color: "bg-purple-500",
       change: "+8% this month",
@@ -286,7 +294,7 @@ export default function CollectorDashboard() {
                     </div>
                     <div className="text-right">
                       <p className="text-green-400 font-semibold">
-                        ${bid.amount.toFixed(2)}
+                        {formatCurrency(bid.amount, user?.currency)}
                       </p>
                       <p className="text-gray-400 text-xs">Your bid</p>
                     </div>
@@ -331,7 +339,7 @@ export default function CollectorDashboard() {
                             Won {new Date(bid.respondedAt).toLocaleDateString()}
                           </span>
                           <span className="text-green-400 font-bold">
-                            ${bid.amount.toFixed(2)}
+                            {formatCurrency(bid.amount, user?.currency)}
                           </span>
                         </div>
                       </div>
