@@ -361,7 +361,7 @@ export const bidController = {
     await bid.save();
 
     // Update listing
-    listing.status = "sold";
+    listing.status = "bidding_closed";
     listing.acceptedBidId = bid._id as any;
     listing.acceptedBuyerId = bid.bidderId;
     listing.closedAt = new Date();

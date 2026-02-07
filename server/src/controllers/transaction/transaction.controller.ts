@@ -106,6 +106,12 @@ export const transactionController = {
       }
     }
 
+    if (transaction.sellerConfirmed && transaction.buyerConfirmed) {
+      await ListingModel.findByIdAndUpdate(transaction.listingId, {
+        status: "sold",
+      });
+    }
+
     await transaction.save();
 
     return res.status(OK).json({
