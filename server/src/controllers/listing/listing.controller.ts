@@ -168,6 +168,10 @@ export const listingController = {
   getAllListings: catchErrors(async (req, res) => {
     const listings = await ListingModel.find({
       status: "active",
+      $or: [
+        { biddingDeadline: { $exists: false } },
+        { biddingDeadline: { $gt: new Date() } },
+      ],
     })
       .populate("sellerId", "firstName lastName rating accountType")
       .sort({ createdAt: -1 })
@@ -190,6 +194,10 @@ export const listingController = {
 
     const listings = await ListingModel.find({
       status: "active",
+      $or: [
+        { biddingDeadline: { $exists: false } },
+        { biddingDeadline: { $gt: new Date() } },
+      ],
       location: {
         $near: {
           $geometry: {
@@ -227,6 +235,22 @@ export const listingController = {
       );
 
     appAssert(listing, NOT_FOUND, "Listing not found");
+
+    // Check for expiration
+    if (
+      listing.status === "active" &&
+      listing.biddingDeadline &&
+      listing.biddingDeadline < new Date()
+    ) {
+      listing.status = "expired";
+      await listing.save();
+
+      // Emit update
+      io.emit("listing:updated", {
+        listingId: listing._id,
+        updates: { status: "expired" },
+      });
+    }
 
     listing.views += 1;
     await listing.save();
@@ -270,6 +294,22 @@ export const listingController = {
     const listings = await ListingModel.find({ sellerId })
       .sort({ createdAt: -1 })
       .populate("acceptedBuyerId", "firstName lastName");
+
+    // Check for expiration in fetched listings
+    let hasUpdates = false;
+    const now = new Date();
+
+    for (const listing of listings) {
+      if (
+        listing.status === "active" &&
+        listing.biddingDeadline &&
+        listing.biddingDeadline < now
+      ) {
+        listing.status = "expired";
+        await listing.save();
+        hasUpdates = true;
+      }
+    }
 
     return res.status(OK).json({
       data: { listings, total: listings.length },

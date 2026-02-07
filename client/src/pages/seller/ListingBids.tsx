@@ -194,7 +194,8 @@ export default function ListingBids() {
                 <div className="mt-6 flex justify-end gap-3 border-t border-gray-700 pt-4">
                   {bid.status === "pending" &&
                     (listing.status === "active" ||
-                      listing.status === "bidding_closed") && (
+                      listing.status === "bidding_closed" ||
+                      listing.status === "expired") && (
                       <Button
                         onClick={() => acceptBid(bid._id)}
                         disabled={isAccepting}

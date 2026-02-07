@@ -36,6 +36,7 @@ export default function CreateListing() {
   const [price, setPrice] = useState<number>(0);
   const [materials, setMaterials] = useState<string[]>([]);
   const [deadlineHours, setDeadlineHours] = useState<number>(24);
+  const [customDeadline, setCustomDeadline] = useState<string>("");
 
   // Upload & Analyze
   const { mutate: analyzeImage, isPending: isAnalyzing } = useMutation({
@@ -132,9 +133,12 @@ export default function CreateListing() {
           weight,
           materials,
         },
-        biddingDeadline: new Date(
-          Date.now() + deadlineHours * 60 * 60 * 1000,
-        ).toISOString(),
+        biddingDeadline:
+          deadlineHours === 0 && customDeadline
+            ? new Date(customDeadline).toISOString()
+            : new Date(
+                Date.now() + deadlineHours * 60 * 60 * 1000,
+              ).toISOString(),
         status: "active" as const,
       };
 
@@ -377,7 +381,27 @@ export default function CreateListing() {
                   <option value={24}>24 Hours (1 Day)</option>
                   <option value={48}>48 Hours (2 Days)</option>
                   <option value={72}>72 Hours (3 Days)</option>
+                  <option value={0}>Custom Date & Time</option>
                 </select>
+
+                {deadlineHours === 0 && (
+                  <div className="mt-2">
+                    <Label htmlFor="customDate" className="text-gray-300">
+                      Select End Time
+                    </Label>
+                    <Input
+                      id="customDate"
+                      type="datetime-local"
+                      className="mt-1 bg-gray-700 border-gray-600 text-white"
+                      min={new Date(
+                        Date.now() - new Date().getTimezoneOffset() * 60000,
+                      )
+                        .toISOString()
+                        .slice(0, 16)}
+                      onChange={(e) => setCustomDeadline(e.target.value)}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="bg-gray-700 rounded-lg p-4">

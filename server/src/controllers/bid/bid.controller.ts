@@ -350,9 +350,11 @@ export const bidController = {
       "You can only accept bids on your own listings",
     );
     appAssert(
-      listing.status === "active" || listing.status === "bidding_closed",
+      listing.status === "active" ||
+        listing.status === "bidding_closed" ||
+        listing.status === "expired",
       BAD_REQUEST,
-      "Listing is not active or awaiting winner selection",
+      "Listing is not active, expired, or awaiting winner selection",
     );
 
     // Update bid status

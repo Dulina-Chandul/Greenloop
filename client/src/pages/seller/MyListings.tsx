@@ -57,9 +57,9 @@ const STATUS_CONFIG = {
 export default function MyListings() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<"active" | "pending" | "sold">(
-    "active",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "active" | "pending" | "sold" | "expired"
+  >("active");
 
   // Fetch seller listings
   const { data: listingsData, isLoading } = useQuery({
@@ -81,10 +81,12 @@ export default function MyListings() {
   });
 
   const listings = listingsData || [];
+
   const filteredListings = listings.filter((listing: any) => {
     if (activeTab === "active") return listing.status === "active";
     if (activeTab === "pending") return listing.status === "bidding_closed";
     if (activeTab === "sold") return listing.status === "sold";
+    if (activeTab === "expired") return listing.status === "expired";
     return false;
   });
 
@@ -165,6 +167,11 @@ export default function MyListings() {
               key: "sold",
               label: "Sold History",
               count: listings.filter((l: any) => l.status === "sold").length,
+            },
+            {
+              key: "expired",
+              label: "Expired / Ended",
+              count: listings.filter((l: any) => l.status === "expired").length,
             },
           ].map((tab) => (
             <button
@@ -262,7 +269,8 @@ export default function MyListings() {
                   </div>
 
                   {/* Actions */}
-                  {listing.status === "active" ? (
+                  {listing.status === "active" ||
+                  listing.status === "expired" ? (
                     <Button
                       onClick={() =>
                         navigate(`/seller/listing/${listing._id}/bids`)
