@@ -10,11 +10,16 @@ import {
   MapPin,
   User,
   Eye,
+  CheckCircle,
+  Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
 import axiosInstance from "@/config/api/axiosInstance";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 
 export default function SellerEarnings() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"active" | "history">("active");
 
   // Fetch transactions
@@ -39,6 +44,24 @@ export default function SellerEarnings() {
   const completedCount = transactions.filter(
     (t: any) => t.status === "completed",
   ).length;
+
+  // Confirm pickup mutation
+  const { mutate: confirmPickup, isPending: isConfirming } = useMutation({
+    mutationFn: async (transactionId: string) => {
+      await axiosInstance.post(`/transactions/${transactionId}/confirm`, {
+        role: "seller",
+      });
+    },
+    onSuccess: () => {
+      toast.success("Pickup confirmed successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["seller-transactions", activeTab],
+      });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to confirm pickup");
+    },
+  });
 
   if (isLoading) {
     return (
@@ -238,17 +261,42 @@ export default function SellerEarnings() {
                       </div>
 
                       {activeTab === "active" && (
-                        <button
-                          onClick={() =>
-                            navigate(
-                              `/seller/listing/${transaction.listingId._id}`,
-                            )
-                          }
-                          className="mt-4 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-                        >
-                          <Eye size={16} />
-                          View Details
-                        </button>
+                        <div className="flex flex-col gap-2 mt-4">
+                          {!transaction.sellerConfirmed && (
+                            <button
+                              onClick={() => confirmPickup(transaction._id)}
+                              disabled={isConfirming}
+                              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                            >
+                              {isConfirming ? (
+                                <>
+                                  <Loader2 className="animate-spin" size={16} />
+                                  Confirming...
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle size={16} />
+                                  Confirm Pickup
+                                </>
+                              )}
+                            </button>
+                          )}
+                          <button
+                            onClick={() =>
+                              navigate(
+                                `/seller/listing/${transaction.listingId._id}`,
+                              )
+                            }
+                            className={`px-4 py-2 ${
+                              transaction.sellerConfirmed
+                                ? "bg-green-600 hover:bg-green-700 text-white"
+                                : "bg-gray-700 hover:bg-gray-600 text-gray-200"
+                            } rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2`}
+                          >
+                            <Eye size={16} />
+                            View Details
+                          </button>
+                        </div>
                       )}
 
                       {activeTab === "history" && (

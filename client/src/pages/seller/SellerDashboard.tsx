@@ -67,7 +67,7 @@ export default function SellerDashboard() {
   const { data: listingsData } = useQuery({
     queryKey: ["seller-listings"],
     queryFn: async () => {
-      const response = await axiosInstance.get("/seller/listings");
+      const response = await axiosInstance.get("/listings/seller/my-listings");
       return response.data.listings;
     },
   });

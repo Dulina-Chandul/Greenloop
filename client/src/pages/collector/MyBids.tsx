@@ -27,14 +27,17 @@ export default function MyBids() {
   const bids = Array.isArray(bidsData) ? bidsData : [];
 
   const filteredBids = bids.filter((bid: any) => {
+    // Safety check for missing listing data
+    if (!bid.listingId) return false;
+
     if (activeTab === "active")
-      return bid.status === "pending" && bid.listingId?.status === "active";
+      return bid.status === "pending" && bid.listingId.status === "active";
     if (activeTab === "won") return bid.status === "accepted";
     if (activeTab === "lost")
       return (
         bid.status === "rejected" ||
         bid.status === "withdrawn" ||
-        (bid.status === "pending" && bid.listingId?.status !== "active")
+        (bid.status === "pending" && bid.listingId.status !== "active")
       );
     return false;
   });

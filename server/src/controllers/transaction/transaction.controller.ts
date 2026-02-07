@@ -2,6 +2,8 @@ import { OK, NOT_FOUND, BAD_REQUEST } from "../../constants/http";
 import TransactionModel from "../../models/transaction/transaction.model";
 import catchErrors from "../../utils/catchErrors";
 import appAssert from "../../utils/appAssert";
+import SellerModel from "../../models/seller/seller.model";
+import ListingModel from "../../models/lising/listing.model";
 
 export const transactionController = {
   //* Get transactions (Earnings/Orders)
@@ -16,6 +18,10 @@ export const transactionController = {
       filter.buyerId = userId;
     }
 
+    if (req.query.listingId) {
+      filter.listingId = req.query.listingId;
+    }
+
     if (status === "active") {
       filter.status = { $in: ["scheduled", "in_progress"] };
     } else if (status === "history") {
@@ -28,10 +34,7 @@ export const transactionController = {
       .populate("buyerId", "firstName lastName phoneNumber address email")
       .sort({ createdAt: -1 });
 
-    let totalAmount = 0;
-    if (status === "history") {
-      totalAmount = transactions.reduce((sum, t) => sum + t.agreedPrice, 0);
-    }
+    const totalAmount = transactions.reduce((sum, t) => sum + t.agreedPrice, 0);
 
     return res.status(OK).json({
       data: {
@@ -82,6 +85,25 @@ export const transactionController = {
       transaction.status = "completed";
       transaction.paymentStatus = "completed";
       transaction.completedAt = new Date();
+
+      // Update seller stats
+      const seller = await SellerModel.findById(transaction.sellerId);
+      if (seller) {
+        seller.stats.totalEarnings += transaction.agreedPrice;
+        seller.stats.completedTransactions += 1;
+        if (transaction.actualWeight) {
+          seller.stats.totalWasteSold += transaction.actualWeight;
+        } else {
+          // If actual weight isn't set, maybe use estimated/final weight from listing if available?
+          // For now, let's try to fetch it from listing if we really need it, or just skip.
+          // Let's check listing for finalWeight
+          const listing = await ListingModel.findById(transaction.listingId);
+          if (listing && listing.finalWeight) {
+            seller.stats.totalWasteSold += listing.finalWeight;
+          }
+        }
+        await seller.save();
+      }
     }
 
     await transaction.save();
