@@ -2,11 +2,14 @@ import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import { useAppSelector } from "@/redux/hooks/hooks";
+import { selectUser } from "@/redux/slices/authSlice";
 import { Upload, Loader2, CheckCircle, Edit2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axiosInstance from "@/config/api/axiosInstance";
+import { formatCurrency } from "@/config/currency";
 
 interface AIAnalysis {
   detectedMaterials: Array<{
@@ -23,6 +26,7 @@ interface AIAnalysis {
 
 export default function CreateListing() {
   const navigate = useNavigate();
+  const user = useAppSelector(selectUser);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -353,7 +357,7 @@ export default function CreateListing() {
                     htmlFor="price"
                     className="text-gray-300 flex items-center gap-2"
                   >
-                    Estimated Value (Rs.)
+                    Estimated Value (LKR)
                     <Edit2 size={14} className="text-gray-500" />
                   </Label>
                   <Input
@@ -418,7 +422,7 @@ export default function CreateListing() {
                   <div className="flex justify-between">
                     <span className="text-gray-400">Est. Value:</span>
                     <span className="text-green-400 font-semibold">
-                      Rs. {price}
+                      {formatCurrency(price, user?.currency)}
                     </span>
                   </div>
                   <div className="flex justify-between">

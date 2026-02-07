@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/config/api/axiosInstance";
+import { formatCurrency } from "@/config/currency";
+import { useAppSelector } from "@/redux/hooks/hooks";
+import { selectUser } from "@/redux/slices/authSlice";
 
 const STATUS_CONFIG = {
   active: {
@@ -56,6 +59,7 @@ const STATUS_CONFIG = {
 
 export default function MyListings() {
   const navigate = useNavigate();
+  const user = useAppSelector(selectUser);
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<
     "active" | "pending" | "sold" | "expired"
@@ -244,13 +248,11 @@ export default function MyListings() {
                           ? "Current Bid"
                           : "Est. Value"}
                       </p>
-                      <p className="text-xl font-bold text-white">
-                        $
-                        {(
-                          listing.currentHighestBid ||
-                          listing.finalValue ||
-                          0
-                        ).toFixed(2)}
+                      <p className="font-semibold text-white">
+                        {formatCurrency(
+                          listing.currentHighestBid || listing.finalValue || 0,
+                          user?.currency,
+                        )}
                         <span className="text-sm text-gray-400 ml-1">/kg</span>
                       </p>
                     </div>

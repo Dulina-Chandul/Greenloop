@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { Clock, DollarSign, Package, MapPin, Phone, User } from "lucide-react";
+import { Clock, Package, MapPin, Phone, User } from "lucide-react";
+import { formatCurrency } from "@/config/currency";
+import { useAppSelector } from "@/redux/hooks/hooks";
+import { selectUser } from "@/redux/slices/authSlice";
 import axiosInstance from "@/config/api/axiosInstance";
 
 export default function MyBids() {
   const navigate = useNavigate();
+  const user = useAppSelector(selectUser);
   const [activeTab, setActiveTab] = useState<"active" | "won" | "lost">(
     "active",
   );
@@ -161,16 +165,20 @@ export default function MyBids() {
                   <div className="grid grid-cols-2 gap-4 bg-gray-900/50 rounded-lg p-3">
                     <div>
                       <p className="text-xs text-gray-400 mb-1">My Bid</p>
-                      <p className="text-lg font-bold text-white flex items-center">
-                        ${bid.amount.toFixed(2)}
+                      <p className="text-sm font-bold text-green-400">
+                        {formatCurrency(bid.amount, user?.currency)}
                       </p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-400 mb-1">
                         Current Highest
                       </p>
-                      <p className="text-lg font-bold text-gray-300">
-                        ${(bid.listingId?.currentHighestBid || 0).toFixed(2)}
+                      <p className="text-xs text-gray-500">
+                        Top Bid:{" "}
+                        {formatCurrency(
+                          bid.listingId?.currentHighestBid || 0,
+                          user?.currency,
+                        )}
                       </p>
                     </div>
                   </div>

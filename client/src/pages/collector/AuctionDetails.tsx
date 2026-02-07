@@ -20,6 +20,7 @@ import { createBidAPI, getListingBidsAPI } from "@/apiservices/bid/bidAPI";
 import { io, Socket } from "socket.io-client";
 import { useAppSelector } from "@/redux/hooks/hooks";
 import { selectUser } from "@/redux/slices/authSlice";
+import { formatCurrency } from "@/config/currency";
 
 import { useLocation } from "react-router";
 
@@ -324,7 +325,7 @@ export default function AuctionDetails() {
         <div className="max-w-7xl mx-auto">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-gray-400 hover:text-white mb-4"
+            className="flex items-center gap-2 text-gray-400 hover:text-green-400 hover:bg-transparent mb-4 transition-colors"
           >
             <ArrowLeft size={20} />
             Back to Auctions
@@ -460,7 +461,7 @@ export default function AuctionDetails() {
                       <p
                         className={`font-bold ${index === 0 ? "text-green-400 text-lg" : "text-white"}`}
                       >
-                        ${bid.amount.toFixed(2)}
+                        {formatCurrency(bid.amount, user?.currency)}
                       </p>
                       {index === 0 && (
                         <span className="text-green-400 text-xs">
@@ -523,7 +524,10 @@ export default function AuctionDetails() {
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <TrendingUp className="text-green-400" size={24} />
                   <p className="text-4xl font-bold text-white">
-                    ${(listing.currentHighestBid || 0).toFixed(2)}
+                    {formatCurrency(
+                      listing.currentHighestBid || 0,
+                      user?.currency,
+                    )}
                   </p>
                 </div>
                 <span className="text-xs text-gray-400">
@@ -554,11 +558,13 @@ export default function AuctionDetails() {
                       Winning Bid
                     </p>
                     <p className="text-xl font-bold text-white">
-                      $
-                      {bids
-                        .find((b: any) => b.status === "accepted")
-                        ?.amount.toFixed(2) ||
-                        listing.currentHighestBid?.toFixed(2)}
+                      {formatCurrency(
+                        bids.find((b: any) => b.status === "accepted")
+                          ?.amount ||
+                          listing.currentHighestBid ||
+                          0,
+                        user?.currency,
+                      )}
                     </p>
                   </div>
                 </div>
@@ -608,7 +614,7 @@ export default function AuctionDetails() {
                         disabled={listing.status !== "active"}
                         className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-green-400 border border-green-500/30 rounded-full text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        +${inc}
+                        +{formatCurrency(inc, user?.currency)}
                       </button>
                     ))}
                   </div>

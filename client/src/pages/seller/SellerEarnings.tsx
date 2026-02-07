@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import {
   DollarSign,
@@ -14,11 +14,14 @@ import {
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { formatCurrency } from "@/config/currency";
+import { useAppSelector } from "@/redux/hooks/hooks";
+import { selectUser } from "@/redux/slices/authSlice";
 import axiosInstance from "@/config/api/axiosInstance";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
 
 export default function SellerEarnings() {
   const navigate = useNavigate();
+  const user = useAppSelector(selectUser);
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"active" | "history">("active");
 
@@ -123,9 +126,9 @@ export default function SellerEarnings() {
                 <p className="text-sm text-gray-400">
                   {activeTab === "history" ? "Total Earned" : "Pending"}
                 </p>
-                <p className="text-3xl font-bold text-white">
-                  ${totalAmount.toFixed(2)}
-                </p>
+                <div className="text-3xl font-bold text-white mb-2">
+                  {formatCurrency(totalAmount, user?.currency)}
+                </div>
               </div>
             </div>
           </div>
@@ -255,8 +258,11 @@ export default function SellerEarnings() {
                     <div className="flex flex-col justify-between items-end">
                       <div className="text-right">
                         <p className="text-sm text-gray-400 mb-1">Amount</p>
-                        <p className="text-3xl font-bold text-green-400">
-                          ${transaction.agreedPrice.toFixed(2)}
+                        <p className="text-green-400 font-bold">
+                          {formatCurrency(
+                            transaction.agreedPrice,
+                            user?.currency,
+                          )}
                         </p>
                       </div>
 

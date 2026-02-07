@@ -13,8 +13,11 @@ import { Loader2 } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useAppSelector } from "@/redux/hooks/hooks";
+import { selectUser } from "@/redux/slices/authSlice";
 import axiosInstance from "@/config/api/axiosInstance";
 import { Input } from "@/components/ui/input";
+import { formatCurrency } from "@/config/currency";
 
 // Fix Leaflet default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -137,6 +140,7 @@ export default function LiveMarketMap({
   const [loading, setLoading] = useState(true);
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const socketRef = useRef<Socket | null>(null);
+  const user = useAppSelector(selectUser);
 
   const fetchAllListings = async () => {
     try {
@@ -295,7 +299,7 @@ export default function LiveMarketMap({
                         ⚖️ {listing.finalWeight} kg
                       </span>
                       <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">
-                        💰 Rs. {listing.finalValue}
+                        💰 {formatCurrency(listing.finalValue, user?.currency)}
                       </span>
                     </div>
                     <div className="text-xs text-gray-500 mb-2">
@@ -304,7 +308,11 @@ export default function LiveMarketMap({
                     </div>
                     {listing.currentHighestBid && (
                       <div className="text-xs text-orange-600 font-medium">
-                        🔥 Current Bid: Rs. {listing.currentHighestBid}
+                        🔥 Current Bid:{" "}
+                        {formatCurrency(
+                          listing.currentHighestBid!,
+                          user?.currency,
+                        )}
                       </div>
                     )}
                     <button
@@ -438,7 +446,7 @@ export default function LiveMarketMap({
                       {listing.finalWeight} kg
                     </span>
                     <span className="text-xs text-white font-semibold">
-                      Rs. {listing.finalValue}
+                      {formatCurrency(listing.finalValue, user?.currency)}
                     </span>
                   </div>
                 </div>
@@ -467,6 +475,7 @@ function ListingDetailsModal({
   onClose: () => void;
 }) {
   const navigate = useNavigate();
+  const user = useAppSelector(selectUser);
   const [editBidAmount, setEditBidAmount] = useState<number>(0);
   const [existingBid, setExistingBid] = useState<any>(null);
   const [timeLeft, setTimeLeft] = useState<string>("");
@@ -583,7 +592,7 @@ function ListingDetailsModal({
             <div className="text-center p-3 bg-gray-700 rounded">
               <div className="text-xs text-gray-400">Est. Value</div>
               <div className="font-semibold text-white">
-                ${listing.finalValue}
+                {formatCurrency(listing.finalValue, user?.currency)}
               </div>
             </div>
           </div>
@@ -594,7 +603,7 @@ function ListingDetailsModal({
                 Current Highest Bid
               </div>
               <div className="text-3xl font-bold text-white">
-                Rs. {(listing.currentHighestBid || 0).toFixed(2)}
+                {formatCurrency(listing.currentHighestBid || 0, user?.currency)}
               </div>
             </div>
             <div className="text-right">
@@ -611,7 +620,7 @@ function ListingDetailsModal({
                 <p className="text-blue-400 text-sm mb-2">Your current bid</p>
                 <div className="flex justify-between items-center">
                   <p className="text-2xl font-bold text-white">
-                    ${existingBid.amount.toFixed(2)}
+                    {formatCurrency(existingBid.amount, user?.currency)}
                   </p>
                   <span className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs uppercase">
                     {existingBid.status}
@@ -639,7 +648,7 @@ function ListingDetailsModal({
                     onClick={() => handleQuickBid(inc)}
                     className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-green-400 border border-green-500/30 rounded-full text-sm transition-colors"
                   >
-                    +${inc.toFixed(2)}
+                    + {formatCurrency(inc, user?.currency)}
                   </button>
                 ))}
               </div>

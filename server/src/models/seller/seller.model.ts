@@ -58,6 +58,8 @@ export interface SellerDocument extends mongoose.Document {
     preferredPickupTime?: "morning" | "afternoon" | "evening" | "anytime";
   };
 
+  currency: string;
+
   kycStatus?: "pending" | "verified" | "rejected";
   kycDocuments?: string[];
 
@@ -229,6 +231,11 @@ const sellerSchema = new mongoose.Schema<SellerDocument>(
         type: String,
         enum: ["morning", "afternoon", "evening", "anytime"],
       },
+    },
+
+    currency: {
+      type: String,
+      default: "LKR",
     },
 
     kycStatus: {

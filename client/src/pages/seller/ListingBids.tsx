@@ -1,14 +1,18 @@
 import { useNavigate, useParams } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAppSelector } from "@/redux/hooks/hooks";
+import { selectUser } from "@/redux/slices/authSlice";
 import { ArrowLeft, User, DollarSign, Calendar, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axiosInstance from "@/config/api/axiosInstance";
+import { formatCurrency } from "@/config/currency";
 
 export default function ListingBids() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const user = useAppSelector(selectUser);
 
   const { data: bidsData, isLoading } = useQuery({
     queryKey: ["listing-bids", id],
@@ -72,7 +76,7 @@ export default function ListingBids() {
         <Button
           variant="ghost"
           onClick={() => navigate("/seller/listings")}
-          className="mb-6 text-gray-400 hover:text-white pl-0"
+          className="mb-6 text-gray-400 hover:text-green-400 hover:bg-transparent pl-0"
         >
           <ArrowLeft className="mr-2" size={20} />
           Back to Listings
@@ -145,7 +149,7 @@ export default function ListingBids() {
 
                   <div className="text-right">
                     <p className="text-2xl font-bold text-green-400">
-                      ${bid.amount.toFixed(2)}
+                      {formatCurrency(bid.amount, user?.currency)}
                     </p>
                     <p className="text-gray-400 text-sm">
                       {bid.isHighestBid ? "Highest Bid" : "Ranked Bid"}
