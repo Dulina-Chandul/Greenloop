@@ -157,7 +157,7 @@ export default function CreateListing() {
     },
     onError: (error: any) => {
       console.error("Error creating listing:", error);
-      // Alert the user about the error
+
       const message =
         error?.response?.data?.message ||
         error.message ||
