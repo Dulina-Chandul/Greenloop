@@ -28,6 +28,8 @@ const Register = () => {
 
   //* Form registraition info
   // TODO : use formik later to improve the form validation
+
+  //* Seller informations
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -38,12 +40,12 @@ const Register = () => {
     "household",
   );
 
+  //* Seller address and buisness details
   const [province, setProvince] = useState("");
   const [district, setDistrict] = useState("");
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [street, setStreet] = useState("");
-
   const [businessName, setBusinessName] = useState("");
   const [businessRegistration, setBusinessRegistration] = useState("");
 
@@ -119,14 +121,14 @@ const Register = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-4">
-            {/* API Error Message */}
+            {/* Error message */}
             {isError && (
               <div className="rounded-md bg-red-50 p-3 text-sm font-medium text-red-600 border border-red-200">
                 {error?.message || "Registration failed. Please try again."}
               </div>
             )}
 
-            {/* Personal Information */}
+            {/* Seller personal information */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-gray-900">
                 Personal Information
@@ -200,7 +202,6 @@ const Register = () => {
                 </Select>
               </div>
 
-              {/* Business Info - only show if business account */}
               {accountType === "business" && (
                 <div className="space-y-4 p-4 bg-gray-50 rounded-md">
                   <h4 className="text-sm font-medium text-gray-700">
@@ -234,7 +235,7 @@ const Register = () => {
               )}
             </div>
 
-            {/* Address Information */}
+            {/* seller address information */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-gray-900">Address</h3>
 
@@ -298,7 +299,6 @@ const Register = () => {
               </div>
             </div>
 
-            {/* Password */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-gray-900">Security</h3>
 
@@ -336,7 +336,6 @@ const Register = () => {
               </div>
             </div>
 
-            {/* Submit Button */}
             <Button
               className="w-full bg-green-600 hover:bg-green-700 text-white"
               disabled={!isFormValid || isPending}
@@ -345,7 +344,6 @@ const Register = () => {
               {isPending ? "Creating account..." : "Sign up"}
             </Button>
 
-            {/* Login Link */}
             <div className="text-center text-sm text-gray-500 mt-4">
               Already have an account?{" "}
               <Link
