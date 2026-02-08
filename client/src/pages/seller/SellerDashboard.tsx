@@ -9,7 +9,6 @@ import {
   Plus,
   Sparkles,
   Play,
-  BarChart3,
   Eye,
   CheckCircle2,
   Clock,
@@ -83,7 +82,6 @@ export default function SellerDashboard() {
     const config =
       STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] ||
       STATUS_CONFIG.draft;
-    const Icon = config.icon;
 
     return (
       <span
