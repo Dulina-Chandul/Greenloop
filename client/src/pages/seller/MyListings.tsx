@@ -4,8 +4,6 @@ import { useNavigate } from "react-router";
 import {
   Plus,
   Clock,
-  DollarSign,
-  Eye,
   Hammer,
   CheckCircle2,
   AlertCircle,

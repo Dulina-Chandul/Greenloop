@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAppSelector } from "@/redux/hooks/hooks";
 import { selectUser } from "@/redux/slices/authSlice";
-import { ArrowLeft, User, DollarSign, Calendar, Check, X } from "lucide-react";
+import { ArrowLeft, User, Calendar, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axiosInstance from "@/config/api/axiosInstance";
