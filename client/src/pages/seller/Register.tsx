@@ -26,6 +26,8 @@ const Register = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
+  //* Form registraition info
+  // TODO : use formik later to improve the form validation
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
