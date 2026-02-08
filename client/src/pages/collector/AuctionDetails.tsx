@@ -10,7 +10,6 @@ import {
   Package,
   Scale,
   User,
-  X,
   CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
