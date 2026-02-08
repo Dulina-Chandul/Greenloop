@@ -1,4 +1,3 @@
-// src/pages/collector/Register.tsx
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router";
@@ -19,6 +18,9 @@ import { registerCollectorAPI } from "@/apiservices/collector/collectorAPI";
 const CollectorRegister = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  //* Collector registraition info
+  // TODO : use formik later to improve the form validation
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -101,7 +103,7 @@ const CollectorRegister = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-4">
-            {/* API Error Message */}
+            {/*  Error message */}
             {isError && (
               <div className="rounded-md bg-red-50 p-3 text-sm font-medium text-red-600 border border-red-200">
                 {error?.message || "Registration failed. Please try again."}
@@ -165,7 +167,6 @@ const CollectorRegister = () => {
               </div>
             </div>
 
-            {/* Optional Business Info */}
             <div className="space-y-4 p-4 bg-gray-50 rounded-md">
               <h4 className="text-sm font-medium text-gray-700">
                 Business Information (Optional)
@@ -198,7 +199,6 @@ const CollectorRegister = () => {
               </div>
             </div>
 
-            {/* Address Information */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-gray-900">
                 Service Area
@@ -264,7 +264,6 @@ const CollectorRegister = () => {
               </div>
             </div>
 
-            {/* Password */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-gray-900">Security</h3>
 
@@ -302,7 +301,6 @@ const CollectorRegister = () => {
               </div>
             </div>
 
-            {/* Submit Button */}
             <Button
               className="w-full bg-green-600 hover:bg-green-700 text-white"
               disabled={!isFormValid || isPending}
@@ -311,7 +309,6 @@ const CollectorRegister = () => {
               {isPending ? "Creating account..." : "Sign up as Collector"}
             </Button>
 
-            {/* Login Link */}
             <div className="text-center text-sm text-gray-500 mt-4">
               Already have an account?{" "}
               <Link
@@ -322,7 +319,6 @@ const CollectorRegister = () => {
               </Link>
             </div>
 
-            {/* Register as Seller Link */}
             <div className="text-center text-sm text-gray-500">
               Want to sell instead?{" "}
               <Link
