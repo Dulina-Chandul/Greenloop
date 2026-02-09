@@ -50,7 +50,6 @@ export default function SellerLayout({ children }: SellerLayoutProps) {
           <UserMenu />
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 px-4 py-6 overflow-y-auto">
           <ul className="space-y-2">
             {menuItems.map((item) => {
@@ -77,7 +76,6 @@ export default function SellerLayout({ children }: SellerLayoutProps) {
           </ul>
         </nav>
 
-        {/* Quick Tip */}
         <div className="p-4 m-4 bg-green-900 border border-green-700 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
             <div className="p-1 bg-green-600 rounded">
@@ -99,7 +97,6 @@ export default function SellerLayout({ children }: SellerLayoutProps) {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 overflow-hidden">{children}</main>
 
       {/* Overlay for mobile */}

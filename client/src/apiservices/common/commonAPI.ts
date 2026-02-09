@@ -1,5 +1,5 @@
 import axiosInstance from "@/config/api/axiosInstance";
-import { clearAuth } from "@/redux/slices/authSlice";
+import { clearAuth, setAuth } from "@/redux/slices/authSlice";
 import type { AppDispatch } from "@/redux/store/store";
 
 type resetPasswordParams = {
@@ -32,7 +32,17 @@ export const resetPasswordAPI = async ({
 //TODO : get the user from the store
 export const getUserAPI = async (dispatch?: AppDispatch) => {
   const response = await axiosInstance.get("/user");
-  return response as any;
+
+  if (dispatch && response?.data?.user && response?.data?.role) {
+    dispatch(
+      setAuth({
+        user: response.data.user,
+        role: response.data.role,
+      }),
+    );
+  }
+
+  return response.data as any;
 };
 
 export const logout = async (dispatch: AppDispatch) => {
