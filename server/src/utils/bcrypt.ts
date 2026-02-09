@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 
+//* Hash the value
 export const hashValue = async (
   value: string,
   saltRounds?: number,
@@ -8,6 +9,7 @@ export const hashValue = async (
   return await bcrypt.hash(value, salt);
 };
 
+//* Compare the value
 export const compareValue = async (
   value: string,
   hashedValue: string,

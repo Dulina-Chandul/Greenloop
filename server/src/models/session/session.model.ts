@@ -4,6 +4,7 @@ import { thirtyDaysFromNow } from "../../utils/date";
 export interface SessionDocument extends mongoose.Document {
   userId: mongoose.Types.ObjectId;
   userAgent?: string;
+  //TODO : Remove the user role later
   userRole: "user" | "seller" | "collector";
   createdAt: Date;
   expiresAt: Date;

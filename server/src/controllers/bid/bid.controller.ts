@@ -7,8 +7,8 @@ import {
   OK,
 } from "../../constants/http";
 import BidModel from "../../models/bid/bid.model";
-import ListingModel from "../../models/lising/listing.model";
-import CollectorModel from "../../models/collector/collecter.model";
+import ListingModel from "../../models/listing/listing.model";
+import CollectorModel from "../../models/collector/collector.model";
 import appAssert from "../../utils/appAssert";
 import catchErrors from "../../utils/catchErrors";
 import { io } from "../../utils/socket";

@@ -276,7 +276,7 @@ const Register = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="postalCode">Postal Code (Optional)</Label>
+                  <Label htmlFor="postalCode">Postal Code </Label>
                   <Input
                     id="postalCode"
                     value={postalCode}
@@ -288,7 +288,7 @@ const Register = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="street">Street Address (Optional)</Label>
+                <Label htmlFor="street">Street Address </Label>
                 <Input
                   id="street"
                   value={street}
@@ -351,6 +351,16 @@ const Register = () => {
                 className="font-semibold text-green-600 hover:text-green-500 hover:underline"
               >
                 Sign in
+              </Link>
+            </div>
+
+            <div className="text-center text-sm text-gray-500">
+              Want to collect instead?{" "}
+              <Link
+                to="/collector/register"
+                className="font-semibold text-green-600 hover:text-green-500 hover:underline"
+              >
+                Register as Collector
               </Link>
             </div>
           </CardContent>

@@ -49,15 +49,15 @@ listingRouter.get("/all", authenticate, listingController.getAllListings);
 //* Get nearby listings
 listingRouter.get("/nearby", authenticate, listingController.getNearbyListings);
 
-//* Get listing by id
-listingRouter.get("/:id", authenticate, listingController.getListingById);
-
 listingRouter.get(
-  "/seller/my-listings",
+  "/my-listings",
   authenticate,
   isSeller,
   listingController.getSellerListings,
 );
+
+//* Get listing by id
+listingRouter.get("/:id", authenticate, listingController.getListingById);
 
 //* Close bidding
 listingRouter.put(

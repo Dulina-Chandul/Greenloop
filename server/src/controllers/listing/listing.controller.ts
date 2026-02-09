@@ -10,7 +10,7 @@ import appAssert from "../../utils/appAssert";
 import catchErrors from "../../utils/catchErrors";
 import ListingModel, {
   ListingDocument,
-} from "../../models/lising/listing.model";
+} from "../../models/listing/listing.model";
 import { uploadImageToCloudinary } from "../../services/cloudinary/cloudinary.service";
 import { analyzeWasteImage } from "../../services/ai/gemini.service";
 import { io } from "../../utils/socket";
@@ -287,15 +287,17 @@ export const listingController = {
       data: { listing },
     });
   }),
-  // Add this method to listingController object
+
+  //* Get seller's own listings  --DONE
   getSellerListings: catchErrors(async (req, res) => {
+    // console.log("This log is from my listings controller ");
+
     const sellerId = req.userId;
 
     const listings = await ListingModel.find({ sellerId })
       .sort({ createdAt: -1 })
       .populate("acceptedBuyerId", "firstName lastName");
 
-    // Check for expiration in fetched listings
     let hasUpdates = false;
     const now = new Date();
 

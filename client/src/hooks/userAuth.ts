@@ -18,7 +18,7 @@ const userAuth = (opts = {}) => {
   const { data: apiUser, ...rest } = useQuery({
     queryKey: [AUTH],
     queryFn: () => getUserAPI(dispatch),
-    staleTime: Infinity,
+    staleTime: 12 * 60 * 60 * 1000,
     enabled: isAuthenticated,
     ...opts,
   });

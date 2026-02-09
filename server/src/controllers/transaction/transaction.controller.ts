@@ -3,7 +3,7 @@ import TransactionModel from "../../models/transaction/transaction.model";
 import catchErrors from "../../utils/catchErrors";
 import appAssert from "../../utils/appAssert";
 import SellerModel from "../../models/seller/seller.model";
-import ListingModel from "../../models/lising/listing.model";
+import ListingModel from "../../models/listing/listing.model";
 
 export const transactionController = {
   //* Get transactions (Earnings/Orders)

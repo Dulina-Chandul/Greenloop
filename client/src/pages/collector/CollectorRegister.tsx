@@ -322,7 +322,7 @@ const CollectorRegister = () => {
             <div className="text-center text-sm text-gray-500">
               Want to sell instead?{" "}
               <Link
-                to="/register/seller"
+                to="/seller/register"
                 className="font-semibold text-green-600 hover:text-green-500 hover:underline"
               >
                 Register as Seller

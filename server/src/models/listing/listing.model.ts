@@ -284,7 +284,7 @@ const listingSchema = new mongoose.Schema<ListingDocument>(
   },
 );
 
-// Calculate final values
+//* Calculate final values
 listingSchema.pre("save", function (next) {
   if (this.manualOverrides?.isManuallyEdited) {
     this.finalWeight =

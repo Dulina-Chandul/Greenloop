@@ -23,7 +23,7 @@ import {
 import SessionModel from "../../models/session/session.model";
 import UserModel from "../../models/user/user.model";
 import SellerModel from "../../models/seller/seller.model";
-import CollectorModel from "../../models/collector/collecter.model";
+import CollectorModel from "../../models/collector/collector.model";
 import VerificationCodeModel from "../../models/verification/verification.model";
 import VerificationCodeType from "../../constants/verificationCodeType";
 import appAssert from "../../utils/appAssert";
