@@ -1,5 +1,5 @@
 import { NOT_FOUND, OK } from "../../constants/http";
-import CollectorModel from "../../models/collector/collecter.model";
+import CollectorModel from "../../models/collector/collector.model";
 import SellerModel from "../../models/seller/seller.model";
 import UserModel from "../../models/user/user.model";
 import appAssert from "../../utils/appAssert";

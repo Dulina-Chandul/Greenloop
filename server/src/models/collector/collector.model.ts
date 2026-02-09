@@ -18,10 +18,10 @@ export interface CollectorDocument extends mongoose.Document {
   accountStatus: "active" | "suspended" | "banned" | "pending_verification";
   isVerifiedCollector: boolean;
 
-  //   location: {
-  //     type: "Point";
-  //     coordinates: number[]; // [longitude, latitude]
-  //   };
+  location: {
+    type: "Point";
+    coordinates: number[]; // [longitude, latitude]
+  };
   address: {
     country: string;
     province: string;
@@ -31,8 +31,8 @@ export interface CollectorDocument extends mongoose.Document {
     street?: string;
   };
 
-  serviceRadius: number; // in km - how far the collector travel
-  serviceAreas: string[]; // special Cities/districts they are willing to serve
+  serviceRadius: number; //KM
+  serviceAreas: string[]; // Special Cities
 
   vehicleType?: string;
   vehicleCapacity?: number; //KG
@@ -109,6 +109,7 @@ const collectorSchema = new mongoose.Schema<CollectorDocument>(
     },
     password: {
       type: String,
+      unique: true,
       required: true,
     },
     verified: {
@@ -149,18 +150,17 @@ const collectorSchema = new mongoose.Schema<CollectorDocument>(
       default: false,
     },
 
-    // Location (GeoJSON)
-    // location: {
-    //   type: {
-    //     type: String,
-    //     enum: ["Point"],
-    //     required: true,
-    //   },
-    //   coordinates: {
-    //     type: [Number],
-    //     required: true,
-    //   },
-    // },
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
     address: {
       country: {
         type: String,
@@ -345,14 +345,12 @@ const collectorSchema = new mongoose.Schema<CollectorDocument>(
 );
 
 // collectorSchema.index({ location: "2dsphere" });
-// collectorSchema.index({ email: 1 }, { unique: true }); // Already unique in schema
-// collectorSchema.index({ phoneNumber: 1 }, { unique: true }); // Already unique in schema
 collectorSchema.index({ accountStatus: 1, isVerifiedCollector: 1 });
 collectorSchema.index({ "rating.average": -1 });
 collectorSchema.index({ acceptedMaterials: 1 });
 collectorSchema.index({ serviceAreas: 1 });
 
-// Hash password before saving
+//* Hash password before saving
 collectorSchema.pre("save", async function () {
   if (!this.isModified("password")) {
     return;
@@ -360,12 +358,12 @@ collectorSchema.pre("save", async function () {
   this.password = await hashValue(this.password);
 });
 
-// Compare password method
+//* Compare password method
 collectorSchema.methods.comparePassword = async function (val: string) {
   return await compareValue(val, this.password);
 };
 
-// Omit password from response
+//* Omit password from response
 collectorSchema.methods.omitPassword = function () {
   const collector = this.toObject();
   delete collector.password;

@@ -21,10 +21,11 @@ import { getVerifyEmailTemplate } from "../../utils/emailTemplates";
 import SessionModel from "../../models/session/session.model";
 import { refreshTokenSignOptions, signToken } from "../../utils/jwt";
 import { setAuthCookies } from "../../utils/cookies";
+import { Request, Response } from "express";
 
 const sellerController = {
   //* Seller register
-  register: catchErrors(async (req, res) => {
+  register: catchErrors(async (req: Request, res: Response) => {
     const request = sellerRegisterSchema.parse(req.body);
     const userAgent = req.headers["user-agent"];
 
@@ -98,7 +99,7 @@ const sellerController = {
   }),
 
   //* Seller login
-  login: catchErrors(async (req, res) => {
+  login: catchErrors(async (req: Request, res: Response) => {
     const request = sellerLoginSchema.parse(req.body);
     const userAgent = req.headers["user-agent"];
 

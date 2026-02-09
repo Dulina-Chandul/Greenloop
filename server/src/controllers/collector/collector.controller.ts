@@ -17,12 +17,13 @@ import { refreshTokenSignOptions, signToken } from "../../utils/jwt";
 import appAssert from "../../utils/appAssert";
 import catchErrors from "../../utils/catchErrors";
 import { collectorRegisterSchema } from "../../config/schemas/collector.schemas";
-import CollectorModel from "../../models/collector/collecter.model";
+import CollectorModel from "../../models/collector/collector.model";
 import { sellerLoginSchema } from "../../config/schemas/seller.schemas";
+import { Request, Response } from "express";
 
 const collectorController = {
   //* Collector register
-  register: catchErrors(async (req, res) => {
+  register: catchErrors(async (req: Request, res: Response) => {
     const request = collectorRegisterSchema.parse(req.body);
     const userAgent = req.headers["user-agent"];
 
@@ -71,7 +72,7 @@ const collectorController = {
     //* Create session for the collector
     const session = await SessionModel.create({
       userId: collectorId,
-      userRole: "collector", // ← UPDATED: Add role
+      userRole: "collector",
       ...(userAgent ? { userAgent } : {}),
     });
 

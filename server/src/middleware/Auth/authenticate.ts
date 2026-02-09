@@ -5,7 +5,7 @@ import AppErrorCode from "../../constants/appErrorCode";
 import { verifyToken, UserRole } from "../../utils/jwt";
 import UserModel from "../../models/user/user.model";
 import SellerModel from "../../models/seller/seller.model";
-import CollectorModel from "../../models/collector/collecter.model";
+import CollectorModel from "../../models/collector/collector.model";
 
 //* Authenticate the user using access token
 export const authenticate: RequestHandler = (req, res, next) => {

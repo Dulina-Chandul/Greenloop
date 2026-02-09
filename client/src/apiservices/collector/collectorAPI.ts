@@ -19,8 +19,8 @@ type RegisterDataParams = {
     province: string;
     district: string;
     city: string;
-    postalCode?: string;
-    street?: string;
+    postalCode: string;
+    street: string;
   };
   businessName?: string;
   businessRegistration?: string;

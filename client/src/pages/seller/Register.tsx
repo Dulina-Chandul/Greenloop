@@ -276,7 +276,7 @@ const Register = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="postalCode">Postal Code (Optional)</Label>
+                  <Label htmlFor="postalCode">Postal Code </Label>
                   <Input
                     id="postalCode"
                     value={postalCode}
@@ -288,7 +288,7 @@ const Register = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="street">Street Address (Optional)</Label>
+                <Label htmlFor="street">Street Address </Label>
                 <Input
                   id="street"
                   value={street}
