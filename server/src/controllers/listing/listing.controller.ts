@@ -10,7 +10,7 @@ import appAssert from "../../utils/appAssert";
 import catchErrors from "../../utils/catchErrors";
 import ListingModel, {
   ListingDocument,
-} from "../../models/lising/listing.model";
+} from "../../models/listing/listing.model";
 import { uploadImageToCloudinary } from "../../services/cloudinary/cloudinary.service";
 import { analyzeWasteImage } from "../../services/ai/gemini.service";
 import { io } from "../../utils/socket";
