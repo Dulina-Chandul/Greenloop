@@ -21,10 +21,12 @@ export interface SellerDocument extends mongoose.Document {
   };
 
   accountStatus: "active" | "suspended" | "banned" | "pending_verification";
-  //   location: {
-  //     type: "Point";
-  //     coordinates: number[];
-  //   };
+
+  location: {
+    type: "Point";
+    coordinates: number[];
+  };
+
   address: {
     country: string;
     province: string;
@@ -129,17 +131,17 @@ const sellerSchema = new mongoose.Schema<SellerDocument>(
       default: "active",
     },
 
-    // location: {
-    //   type: {
-    //     type: String,
-    //     enum: ["Point"],
-    //     required: true,
-    //   },
-    //   coordinates: {
-    //     type: [Number],
-    //     required: true,
-    //   },
-    // },
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
     address: {
       country: {
         type: String,
@@ -159,11 +161,11 @@ const sellerSchema = new mongoose.Schema<SellerDocument>(
       },
       postalCode: {
         type: String,
-        required: false,
+        required: true,
       },
       street: {
         type: String,
-        required: false,
+        required: true,
       },
     },
 
@@ -252,8 +254,6 @@ const sellerSchema = new mongoose.Schema<SellerDocument>(
 );
 
 // sellerSchema.index({ location: "2dsphere" });
-// sellerSchema.index({ email: 1 }, { unique: true }); // Already unique in schema
-// sellerSchema.index({ phoneNumber: 1 }, { unique: true }); // Already unique in schema
 sellerSchema.index({ accountStatus: 1 });
 sellerSchema.index({ "rating.average": -1 });
 sellerSchema.index({ accountType: 1 });

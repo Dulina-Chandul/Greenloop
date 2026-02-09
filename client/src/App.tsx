@@ -26,6 +26,7 @@ import SellerEarnings from "./pages/seller/SellerEarnings";
 import Home from "./pages/common/Home";
 import NotFound404 from "./pages/common/NotFound404";
 import Unauthorized from "./pages/common/Unauthorized";
+
 // import './App.css'
 
 function App() {
