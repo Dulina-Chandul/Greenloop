@@ -88,3 +88,8 @@ export const loginSellerAPI = async (
 
   return response;
 };
+
+export const sellerListingAPI = async () => {
+  const response = await axiosInstance.get("/seller/listing/my-listings");
+  return response.data.listings;
+};

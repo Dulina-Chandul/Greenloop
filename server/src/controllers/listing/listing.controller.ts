@@ -287,15 +287,17 @@ export const listingController = {
       data: { listing },
     });
   }),
-  // Add this method to listingController object
+
+  //* Get seller's own listings  --DONE
   getSellerListings: catchErrors(async (req, res) => {
+    // console.log("This log is from my listings controller ");
+
     const sellerId = req.userId;
 
     const listings = await ListingModel.find({ sellerId })
       .sort({ createdAt: -1 })
       .populate("acceptedBuyerId", "firstName lastName");
 
-    // Check for expiration in fetched listings
     let hasUpdates = false;
     const now = new Date();
 

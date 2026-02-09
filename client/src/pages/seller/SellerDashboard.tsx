@@ -18,8 +18,9 @@ import {
 import { Button } from "@/components/ui/button";
 import axiosInstance from "@/config/api/axiosInstance";
 import { formatCurrency } from "@/config/currency";
+import { sellerListingAPI } from "@/apiservices/seller/sellerAPI";
 
-// Status configuration with distinct styling
+//* Status
 const STATUS_CONFIG = {
   active: {
     label: "BIDDING LIVE",
@@ -63,20 +64,18 @@ export default function SellerDashboard() {
   const user = useAppSelector(selectUser);
   const navigate = useNavigate();
 
-  // Fetch listings
   const { data: listingsData } = useQuery({
     queryKey: ["seller-listings"],
-    queryFn: async () => {
-      const response = await axiosInstance.get("/listings/seller/my-listings");
-      return response.data.listings;
-    },
+    queryFn: sellerListingAPI,
   });
 
   const listings = listingsData || [];
-  const activeListings = listings.filter((l: any) => l.status === "active");
+  const activeListings = listings.filter(
+    (list: any) => list.status === "active",
+  );
   const totalEarnings = listings
-    .filter((l: any) => l.status === "sold")
-    .reduce((sum: number, l: any) => sum + (l.currentHighestBid || 0), 0);
+    .filter((list: any) => list.status === "sold")
+    .reduce((sum: number, list: any) => sum + (list.currentHighestBid || 0), 0);
 
   const getStatusBadge = (status: string) => {
     const config =
@@ -98,7 +97,7 @@ export default function SellerDashboard() {
   return (
     <div className="h-full overflow-y-auto bg-gray-900">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-gray-800 via-gray-900 to-gray-900 border-b border-gray-700">
+      <div className="relative bg-linear-to-br from-gray-800 via-gray-900 to-gray-900 border-b border-gray-700">
         <div className="absolute inset-0 opacity-10">
           <img
             src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=1920"
@@ -129,12 +128,12 @@ export default function SellerDashboard() {
               onClick={() => navigate("/seller/create-listing")}
               className="bg-green-600 hover:bg-green-700 h-14 px-8 text-lg"
             >
-              <Plus className="mr-2" size={20} />
+              <Plus className="mr-1" size={20} />
               Create New Listing
             </Button>
             <Button
               variant="outline"
-              className="h-14 px-8 text-lg border-gray-600 hover:bg-gray-800"
+              className="h-14 px-8 text-lg hover:border-green-800 hover:bg-transparent hover:text-green-400"
             >
               <Play className="mr-2" size={20} />
               Watch Tutorial
@@ -144,13 +143,14 @@ export default function SellerDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Stats */}
+        {/* Stats about the seller */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
             <div className="flex items-center justify-between mb-4">
               <div className="bg-blue-500/20 p-3 rounded-lg">
                 <Eye className="text-blue-400" size={24} />
               </div>
+              {/* // TODO : Change the updated time later */}
               <span className="text-xs text-gray-400">Updated 2m ago</span>
             </div>
             <h3 className="text-gray-400 text-sm mb-1">Active Listings</h3>
@@ -169,7 +169,7 @@ export default function SellerDashboard() {
             <h3 className="text-gray-400 text-sm mb-1">Pending Bids</h3>
             <p className="text-4xl font-bold text-white">
               {activeListings.reduce(
-                (sum: number, l: any) => sum + (l.totalBids || 0),
+                (sum: number, list: any) => sum + (list.totalBids || 0),
                 0,
               )}
             </p>
@@ -180,6 +180,7 @@ export default function SellerDashboard() {
               <div className="bg-green-500/20 p-3 rounded-lg">
                 <DollarSign className="text-green-400" size={24} />
               </div>
+              {/* // TODO : Change the percentage later */}
               <span className="text-xs text-green-400 flex items-center gap-1">
                 <TrendingUp size={12} />
                 +12%
@@ -192,7 +193,7 @@ export default function SellerDashboard() {
           </div>
         </div>
 
-        {/* Recent Activity */}
+        {/* Recent activity */}
         <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
           <div className="flex items-center justify-between p-6 border-b border-gray-700">
             <h2 className="text-xl font-bold text-white">Recent Activity</h2>
@@ -258,6 +259,7 @@ export default function SellerDashboard() {
                         ) {
                           navigate(`/seller/listing/${listing._id}`);
                         } else {
+                          // TODO : Nothing happens change the URL
                           navigate(`/seller/listing/${listing._id}/bids`);
                         }
                       }}
