@@ -353,6 +353,16 @@ const Register = () => {
                 Sign in
               </Link>
             </div>
+
+            <div className="text-center text-sm text-gray-500">
+              Want to collect instead?{" "}
+              <Link
+                to="/collector/register"
+                className="font-semibold text-green-600 hover:text-green-500 hover:underline"
+              >
+                Register as Collector
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>
