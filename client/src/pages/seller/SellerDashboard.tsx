@@ -151,7 +151,7 @@ export default function SellerDashboard() {
                 <Eye className="text-blue-400" size={24} />
               </div>
               {/* // TODO : Change the updated time later */}
-              <span className="text-xs text-gray-400">Updated 2m ago</span>
+              {/* <span className="text-xs text-gray-400">Updated 2m ago</span> */}
             </div>
             <h3 className="text-gray-400 text-sm mb-1">Active Listings</h3>
             <p className="text-4xl font-bold text-white">
@@ -164,7 +164,8 @@ export default function SellerDashboard() {
               <div className="bg-orange-500/20 p-3 rounded-lg">
                 <Package className="text-orange-400" size={24} />
               </div>
-              <span className="text-xs text-red-400">Action required</span>
+              {/* // TODO : Change this later */}
+              {/* <span className="text-xs text-red-400">Action required</span> */}
             </div>
             <h3 className="text-gray-400 text-sm mb-1">Pending Bids</h3>
             <p className="text-4xl font-bold text-white">
@@ -181,10 +182,10 @@ export default function SellerDashboard() {
                 <DollarSign className="text-green-400" size={24} />
               </div>
               {/* // TODO : Change the percentage later */}
-              <span className="text-xs text-green-400 flex items-center gap-1">
+              {/* <span className="text-xs text-green-400 flex items-center gap-1">
                 <TrendingUp size={12} />
                 +12%
-              </span>
+              </span> */}
             </div>
             <h3 className="text-gray-400 text-sm mb-1">Total Earnings</h3>
             <div className="text-2xl font-bold text-white mb-1">
