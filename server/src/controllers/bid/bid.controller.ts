@@ -212,7 +212,7 @@ export const bidController = {
       .populate({
         path: "listingId",
         select:
-          "title primaryImage finalWeight address status currentHighestBid sellerId",
+          "title primaryImage finalWeight address status currentHighestBid sellerId location",
         populate: {
           path: "sellerId",
           select: "firstName lastName phoneNumber address email",
