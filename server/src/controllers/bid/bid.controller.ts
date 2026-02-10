@@ -212,7 +212,7 @@ export const bidController = {
       .populate({
         path: "listingId",
         select:
-          "title primaryImage finalWeight address status currentHighestBid sellerId",
+          "title primaryImage finalWeight address status currentHighestBid sellerId location",
         populate: {
           path: "sellerId",
           select: "firstName lastName phoneNumber address email",
@@ -242,6 +242,11 @@ export const bidController = {
 
     const listing = await ListingModel.findById(bid.listingId);
     appAssert(listing, NOT_FOUND, "Listing not found");
+    appAssert(
+      listing.status === "active",
+      BAD_REQUEST,
+      "Listing is not active",
+    );
 
     // Update bid amount
     bid.amount = amount;
@@ -357,6 +362,14 @@ export const bidController = {
       "Listing is not active, expired, or awaiting winner selection",
     );
 
+    // If there was a previously accepted bid, reject it
+    if (listing.acceptedBidId) {
+      await BidModel.findByIdAndUpdate(listing.acceptedBidId, {
+        status: "rejected",
+        respondedAt: new Date(),
+      });
+    }
+
     // Update bid status
     bid.status = "accepted";
     bid.respondedAt = new Date();
@@ -375,8 +388,8 @@ export const bidController = {
       acceptedBidId: bid._id,
       sellerId: listing.sellerId,
       buyerId: bid.bidderId,
-      agreedPrice: bid.amount,
-      sellerReceives: bid.amount, // No platform fee for now
+      agreedPrice: bid.amount, // No platform fee for now
+      sellerReceives: bid.amount,
       paymentStatus: "pending",
       status: "scheduled",
       scheduledPickupDate:
@@ -395,7 +408,7 @@ export const bidController = {
     // Emit socket events
     io.emit("listing:updated", {
       listingId: listing._id,
-      updates: { status: "sold" },
+      updates: { status: "bidding_closed", acceptedBuyerId: bid.bidderId },
     });
 
     io.to(`collector:${bid.bidderId}`).emit("bid:accepted", {

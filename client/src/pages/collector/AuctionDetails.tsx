@@ -36,6 +36,7 @@ export default function AuctionDetails() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [calculatedDistance, setCalculatedDistance] = useState<string>("");
 
   // Fetch listing details
   const { data: listingData, isLoading } = useQuery({
@@ -56,6 +57,36 @@ export default function AuctionDetails() {
 
   const listing = listingData;
   const bids = bidsData?.data?.bids || [];
+
+  useEffect(() => {
+    if (listing?.location?.coordinates && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userLat = position.coords.latitude;
+          const userLng = position.coords.longitude;
+          const [listLng, listLat] = listing.location.coordinates;
+
+          const R = 6371; // Radius of the earth in km
+          const dLat = ((listLat - userLat) * Math.PI) / 180;
+          const dLon = ((listLng - userLng) * Math.PI) / 180;
+          const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos((userLat * Math.PI) / 180) *
+              Math.cos((listLat * Math.PI) / 180) *
+              Math.sin(dLon / 2) *
+              Math.sin(dLon / 2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          const d = R * c; // Distance in km
+
+          setCalculatedDistance(`${d.toFixed(1)} km away`);
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          setCalculatedDistance("Distance N/A");
+        },
+      );
+    }
+  }, [listing]);
 
   // Place bid mutation
   const { mutate: placeBid, isPending } = useMutation({
@@ -398,7 +429,7 @@ export default function AuctionDetails() {
                         ★ {listing.sellerId?.rating?.average.toFixed(1)}
                       </span>
                       <span>•</span>
-                      <span>2.5km away</span>
+                      <span>{calculatedDistance || "Distance N/A"}</span>
                     </div>
                   </div>
                 </div>
@@ -511,7 +542,9 @@ export default function AuctionDetails() {
                     <MapPin className="text-green-400" size={20} />
                   </div>
                   <p className="text-xs text-gray-400 mb-1">DISTANCE</p>
-                  <p className="text-white font-semibold text-sm">2.5 km</p>
+                  <p className="text-white font-semibold text-sm">
+                    {calculatedDistance || "N/A"}
+                  </p>
                 </div>
               </div>
 

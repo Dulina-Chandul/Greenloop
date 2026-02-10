@@ -11,6 +11,7 @@ import catchErrors from "../../utils/catchErrors";
 import ListingModel, {
   ListingDocument,
 } from "../../models/listing/listing.model";
+import SellerModel from "../../models/seller/seller.model";
 import { uploadImageToCloudinary } from "../../services/cloudinary/cloudinary.service";
 import { analyzeWasteImage } from "../../services/ai/gemini.service";
 import { io } from "../../utils/socket";
@@ -57,6 +58,7 @@ const createListingSchema = z.object({
   manualOverrides: z
     .object({
       weight: z.number().optional(),
+      value: z.number().optional(),
       materials: z.array(z.string()).optional(),
       description: z.string().optional(),
     })
@@ -98,7 +100,7 @@ export const listingController = {
         manualOverrides.materials ??
         data.aiAnalysis.detectedMaterials.map((m) => m.materialType);
       // Using logic from model's pre-save hook
-      finalValue = finalWeight * 50;
+      finalValue = manualOverrides.value ?? finalWeight * 50;
     } else {
       finalWeight = data.aiAnalysis.totalEstimatedWeight;
       finalMaterials = data.aiAnalysis.detectedMaterials.map(
@@ -140,13 +142,19 @@ export const listingController = {
     appAssert(req.userId, FORBIDDEN, "Authentication required");
 
     const sellerId = req.userId;
+    const seller = await SellerModel.findById(sellerId);
+    appAssert(seller, FORBIDDEN, "Seller not found");
 
     const imageUrl = await uploadImageToCloudinary(
       req.file.buffer,
       "waste-images",
     );
 
-    const aiAnalysis = await analyzeWasteImage(imageUrl);
+    const aiAnalysis = await analyzeWasteImage(
+      imageUrl,
+      seller.currency,
+      seller.address.country,
+    );
 
     return res.status(OK).json({
       message: "Image analyzed successfully",

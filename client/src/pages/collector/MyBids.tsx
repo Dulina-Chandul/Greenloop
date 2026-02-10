@@ -220,12 +220,28 @@ export default function MyBids() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.open(
-                              `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                                `${bid.listingId.address.street}, ${bid.listingId.address.city}, ${bid.listingId.address.district}`,
-                              )}`,
-                              "_blank",
-                            );
+                            const location = bid.listingId.location;
+                            let mapsUrl = "";
+
+                            if (
+                              location?.coordinates &&
+                              location.coordinates.length === 2
+                            ) {
+                              const [lng, lat] = location.coordinates;
+                              mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+                            } else {
+                              const addressParts = [
+                                bid.listingId.address?.street,
+                                bid.listingId.address?.city,
+                                bid.listingId.address?.district,
+                              ].filter((part) => part);
+                              const address = addressParts.join(", ");
+                              mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+                                address,
+                              )}`;
+                            }
+
+                            window.open(mapsUrl, "_blank");
                           }}
                           className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 rounded transition-colors"
                         >

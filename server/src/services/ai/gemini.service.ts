@@ -18,34 +18,36 @@ interface WasteAnalysisResult {
 
 export const analyzeWasteImage = async (
   imageUrl: string,
+  currency: string = "LKR",
+  country: string = "Sri Lanka",
 ): Promise<WasteAnalysisResult> => {
   try {
-    const prompt = `Analyze this waste/scrap material image and provide a detailed breakdown in JSON format:
+    const prompt = `Analyze this waste/scrap material image and provide a detailed breakdown in JSON format.
+    
+    Context:
+    - Location: ${country}
+    - Currency: ${currency}
 
+    Instructions:
+    1. Identify the materials present in the image.
+    2. Estimate the weight of each material.
+    3. Estimate the value of each material based on CURRENT market rates in ${country} in ${currency}.
+    
+    Output Format (JSON ONLY):
 {
   "materials": [
     {
       "materialType": "type of material (e.g., PET plastic, aluminum, cardboard)",
       "confidence": 0-100,
       "estimatedWeight": weight in kg,
-      "estimatedValue": estimated value in LKR
+      "estimatedValue": estimated value in ${currency}
     }
   ],
   "totalWeight": total estimated weight in kg,
-  "totalValue": total estimated value in LKR,
+  "totalValue": total estimated value in ${currency},
   "category": "plastic" | "metal" | "paper" | "glass" | "electronic" | "mixed",
-  "description": "A short, concise description of the waste items (e.g. 'A pile of crushed aluminum cans and clear plastic bottles')"
+  "description": "A short, concise description of the waste items"
 }
-
-Pricing reference (LKR per kg):
-- PET plastic: 30-50
-- HDPE plastic: 40-60
-- Aluminum cans: 150-200
-- Steel/Iron: 30-50
-- Cardboard: 10-20
-- Paper: 15-25
-- Glass bottles: 5-10
-- E-waste: 50-150
 
 Respond with ONLY valid JSON, no additional text.`;
 

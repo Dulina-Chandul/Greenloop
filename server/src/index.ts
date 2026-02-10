@@ -18,6 +18,7 @@ import { createServer } from "node:http";
 import { io } from "./utils/socket";
 import bidRouter from "./routes/bid/bid.router";
 import transactionRouter from "./routes/transaction/transaction.route";
+import analyticsRouter from "./routes/analytics/analytics.route";
 
 const app = express();
 const httpServer = createServer(app);
@@ -101,6 +102,9 @@ app.use("/api/v1/bids", bidRouter);
 
 //* Transaction Routes
 app.use("/api/v1/transactions", transactionRouter);
+
+//* Analytics Routes
+app.use("/api/v1/analytics", analyticsRouter);
 
 //* Protected Routes
 app.use("/api/v1/user", userRoutes);

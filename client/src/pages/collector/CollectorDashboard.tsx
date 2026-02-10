@@ -147,7 +147,7 @@ export default function CollectorDashboard() {
       value: wonBids.length.toString(),
       icon: TrendingUp,
       color: "bg-green-500",
-      change: "+12% this month",
+      change: "",
     },
     {
       label: "Total Spent",
@@ -161,7 +161,7 @@ export default function CollectorDashboard() {
       ),
       icon: DollarSign,
       color: "bg-purple-500",
-      change: "+8% this month",
+      change: "",
     },
     {
       label: "Rating",
@@ -199,7 +199,7 @@ export default function CollectorDashboard() {
             <p className="text-sm text-gray-400">
               Share your real-time location while collecting scrap
             </p>
-            {location && isLiveTracking && (
+            {/* {location && isLiveTracking && (
               <div className="mt-2 text-xs text-green-400 flex items-center gap-3">
                 <span>
                   📍 {location.latitude.toFixed(6)},{" "}
@@ -212,7 +212,7 @@ export default function CollectorDashboard() {
                   <span>🎯 ±{location.accuracy.toFixed(0)}m</span>
                 )}
               </div>
-            )}
+            )} */}
             {geoError && (
               <p className="text-xs text-red-400 mt-1">⚠️ {geoError}</p>
             )}

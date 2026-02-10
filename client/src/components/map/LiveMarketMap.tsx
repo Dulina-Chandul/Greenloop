@@ -167,28 +167,36 @@ export default function LiveMarketMap({
   useEffect(() => {
     fetchAllListings();
 
-    // Socket.io setup (optional for now)
+    // Socket.io setup
     try {
       // Connect to the root URL, not the API URL
       const socketUrl = import.meta.env.VITE_API_URL.replace(
         /\/api\/v1\/?$/,
         "",
       );
+
+      // Initialize socket only once or when collectorId changes
       socketRef.current = io(socketUrl, {
         withCredentials: true,
       });
 
+      // Join room
       socketRef.current.emit("collector:join", {
         collectorId,
-        location: collectorLocation,
+        location: collectorLocation, // Initial location
       });
 
       socketRef.current.on("listing:new", (data) => {
-        console.log("New listing:", data.listing);
-        setListings((prev) => [data.listing, ...prev]);
+        console.log("New listing received:", data.listing);
+        setListings((prev) => {
+          // Prevent duplicates
+          if (prev.some((l) => l._id === data.listing._id)) return prev;
+          return [data.listing, ...prev];
+        });
       });
 
       socketRef.current.on("listing:updated", (data) => {
+        console.log("Listing updated:", data);
         setListings((prev) =>
           prev.map((listing) =>
             listing._id === data.listingId
@@ -197,8 +205,9 @@ export default function LiveMarketMap({
           ),
         );
       });
+
       socketRef.current.on("seller:location_update", (data) => {
-        console.log("Seller moved:", data);
+        // console.log("Seller moved:", data);
         setListings((prev) =>
           prev.map((listing) => {
             // Check if this listing belongs to the moving seller
@@ -220,9 +229,24 @@ export default function LiveMarketMap({
     }
 
     return () => {
-      socketRef.current?.disconnect();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
     };
-  }, [collectorId, collectorLocation]);
+    // Removed collectorLocation from dependency array to prevent reconnection loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collectorId]);
+
+  // Separate effect for location updates
+  useEffect(() => {
+    if (socketRef.current && socketRef.current.connected) {
+      socketRef.current.emit("collector:location_update", {
+        collectorId,
+        location: collectorLocation,
+      });
+    }
+  }, [collectorLocation, collectorId]);
 
   if (loading) {
     return (
@@ -504,7 +528,11 @@ function ListingDetailsModal({
       setExistingBid(myBidData);
       setEditBidAmount(myBidData.amount);
     } else {
-      setEditBidAmount((listing.currentHighestBid || 0) + 0.5);
+      if (listing.currentHighestBid && listing.currentHighestBid > 0) {
+        setEditBidAmount(listing.currentHighestBid + 0.5);
+      } else {
+        setEditBidAmount(listing.finalValue);
+      }
     }
   }, [myBidData, listing]);
 
