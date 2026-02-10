@@ -135,6 +135,7 @@ export default function CreateListing() {
         pickupRadius: 5,
         manualOverrides: {
           weight,
+          value: price,
           materials,
         },
         biddingDeadline:

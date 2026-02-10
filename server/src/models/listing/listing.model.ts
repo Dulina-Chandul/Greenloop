@@ -26,6 +26,7 @@ export interface ListingDocument extends mongoose.Document {
   //* If user manually edits the listing
   manualOverrides?: {
     weight?: number;
+    value?: number;
     materials?: string[];
     description?: string;
     isManuallyEdited: boolean;
@@ -148,6 +149,10 @@ const listingSchema = new mongoose.Schema<ListingDocument>(
 
     manualOverrides: {
       weight: {
+        type: Number,
+        min: 0,
+      },
+      value: {
         type: Number,
         min: 0,
       },
@@ -292,7 +297,7 @@ listingSchema.pre("save", function (next) {
     this.finalMaterials =
       this.manualOverrides.materials ||
       this.aiAnalysis.detectedMaterials.map((m) => m.materialType);
-    this.finalValue = this.finalWeight * 50;
+    this.finalValue = this.manualOverrides?.value ?? this.finalWeight * 50;
   } else {
     this.finalWeight = this.aiAnalysis.totalEstimatedWeight;
     this.finalMaterials = this.aiAnalysis.detectedMaterials.map(

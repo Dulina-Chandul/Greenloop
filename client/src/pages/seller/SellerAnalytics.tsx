@@ -201,8 +201,10 @@ export default function SellerAnalytics() {
                   contentStyle={{
                     backgroundColor: "#1f2937",
                     border: "1px solid #374151",
+                    color: "#f3f4f6",
                   }}
-                  labelStyle={{ color: "#fff" }}
+                  itemStyle={{ color: "#f3f4f6" }}
+                  labelStyle={{ color: "#f3f4f6" }}
                 />
                 <Legend />
                 <Line
@@ -249,7 +251,9 @@ export default function SellerAnalytics() {
                   contentStyle={{
                     backgroundColor: "#1f2937",
                     border: "1px solid #374151",
+                    color: "#f3f4f6",
                   }}
+                  itemStyle={{ color: "#f3f4f6" }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -272,11 +276,14 @@ export default function SellerAnalytics() {
               <XAxis dataKey="status" stroke="#9ca3af" />
               <YAxis stroke="#9ca3af" />
               <Tooltip
+                cursor={{ fill: "rgba(255, 255, 255, 0.05)" }}
                 contentStyle={{
                   backgroundColor: "#1f2937",
                   border: "1px solid #374151",
+                  color: "#f3f4f6",
                 }}
-                labelStyle={{ color: "#fff" }}
+                itemStyle={{ color: "#f3f4f6" }}
+                labelStyle={{ color: "#f3f4f6" }}
               />
               <Bar dataKey="count" fill="#10b981">
                 {listingsByStatus?.map((entry: any, index: number) => (
