@@ -87,23 +87,24 @@ export const transactionController = {
       transaction.completedAt = new Date();
 
       // Update seller stats
-      const seller = await SellerModel.findById(transaction.sellerId);
-      if (seller) {
-        seller.stats.totalEarnings += transaction.agreedPrice;
-        seller.stats.completedTransactions += 1;
-        if (transaction.actualWeight) {
-          seller.stats.totalWasteSold += transaction.actualWeight;
-        } else {
-          // If actual weight isn't set, maybe use estimated/final weight from listing if available?
-          // For now, let's try to fetch it from listing if we really need it, or just skip.
-          // Let's check listing for finalWeight
-          const listing = await ListingModel.findById(transaction.listingId);
-          if (listing && listing.finalWeight) {
-            seller.stats.totalWasteSold += listing.finalWeight;
-          }
+      // Update seller stats using findByIdAndUpdate to avoid validation errors
+      let wasteSold = 0;
+      if (transaction.actualWeight) {
+        wasteSold = transaction.actualWeight;
+      } else {
+        const listing = await ListingModel.findById(transaction.listingId);
+        if (listing && listing.finalWeight) {
+          wasteSold = listing.finalWeight;
         }
-        await seller.save();
       }
+
+      await SellerModel.findByIdAndUpdate(transaction.sellerId, {
+        $inc: {
+          "stats.totalEarnings": transaction.agreedPrice,
+          "stats.completedTransactions": 1,
+          "stats.totalWasteSold": wasteSold,
+        },
+      });
     }
 
     if (transaction.sellerConfirmed && transaction.buyerConfirmed) {

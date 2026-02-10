@@ -1,0 +1,149 @@
+{
+  "transaction": {
+    "_id": "698b4b9fb8c5f7686c5464e6",
+    "listingId": "698b0ecaaee0207a3e357541",
+    "acceptedBidId": "698b0ee2aee0207a3e357564",
+    "sellerId": "6983058e33bd2f6e81f63f81",
+    "buyerId": "69823b5f3890f8ca9b806fcc",
+    "agreedPrice": 550,
+    "platformFee": 0,
+    "sellerReceives": 550,
+    "paymentStatus": "pending",
+    "scheduledPickupDate": "2026-02-11T15:15:43.982Z",
+    "scheduledPickupTime": "12:00",
+    "status": "scheduled",
+    "sellerConfirmed": false,
+    "buyerConfirmed": true,
+    "pickupPhotos": [],
+    "disputeStatus": "none",
+    "createdAt": "2026-02-10T15:15:43.984Z",
+    "updatedAt": "2026-02-10T15:15:55.298Z",
+    "__v": 0
+  },
+  "seller": {
+    "businessInfo": {
+      "businessName": "Dulina Hoday",
+      "businessRegistration": "sdsd"
+    },
+    "location": {
+      "coordinates": []
+    },
+    "address": {
+      "country": "Sri Lanka",
+      "province": "Western",
+      "district": "Kalutara",
+      "city": "Mathugama",
+      "postalCode": "21100",
+      "street": "No 157, Kaluthara Road, Polgahawaththa"
+    },
+    "rating": {
+      "average": 0,
+      "totalReviews": 0
+    },
+    "stats": {
+      "totalListings": 0,
+      "activeListings": 0,
+      "completedTransactions": 6,
+      "totalWasteSold": 8.92,
+      "totalEarnings": 242.2
+    },
+    "preferences": {
+      "notifications": {
+        "email": true,
+        "push": true,
+        "sms": false
+      },
+      "language": "en",
+      "autoAcceptBids": false
+    },
+    "_id": "6983058e33bd2f6e81f63f81",
+    "email": "dulinachandul@gmail.com",
+    "password": "$2b$10$Z1HyhjNfcfIO0SkuF47rku7nu6JU.RthI9JRenuNJ5Vt7tq0Dob2a",
+    "verified": true,
+    "firstName": "Dulina",
+    "lastName": "Chandul",
+    "phoneNumber": "0778141964",
+    "avatar": "",
+    "accountType": "business",
+    "accountStatus": "active",
+    "kycDocuments": [],
+    "createdAt": "2026-02-04T08:38:38.149Z",
+    "updatedAt": "2026-02-09T15:24:37.686Z",
+    "__v": 0,
+    "currency": "LKR"
+  },
+  "sellerLocation": {
+    "coordinates": []
+  },
+  "listing": {
+    "aiAnalysis": {
+      "detectedMaterials": [
+        {
+          "materialType": "PET plastic (large water bottles)",
+          "confidence": 95,
+          "estimatedWeight": 0.49,
+          "estimatedValue": 34.3,
+          "_id": "698b0ecaaee0207a3e357542"
+        }
+      ],
+      "totalEstimatedWeight": 0.49,
+      "totalEstimatedValue": 34.3,
+      "analysisTimestamp": "2026-02-10T10:56:10.481Z"
+    },
+    "manualOverrides": {
+      "weight": 0.49,
+      "value": 550,
+      "materials": [
+        "PET plastic (large water bottles)"
+      ],
+      "isManuallyEdited": true,
+      "editedAt": "2026-02-10T10:56:10.477Z"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        80.6337,
+        7.2906
+      ]
+    },
+    "address": {
+      "city": "कँडी",
+      "district": "Central Province"
+    },
+    "_id": "698b0ecaaee0207a3e357541",
+    "sellerId": "6983058e33bd2f6e81f63f81",
+    "title": "plastic Waste - 0.49kg",
+    "description": "A cluster of seven clear PET plastic large water bottles hanging from a tree branch, with fallen leaves and a small amount of general litter on the ground in a rural setting.",
+    "category": "plastic",
+    "finalWeight": 0.49,
+    "finalMaterials": [
+      "PET plastic (large water bottles)"
+    ],
+    "finalValue": 550,
+    "images": [
+      "https://res.cloudinary.com/dulinachandul/image/upload/v1770720947/waste-images/lm8gkpot3clecidgchuf.jpg"
+    ],
+    "primaryImage": "https://res.cloudinary.com/dulinachandul/image/upload/v1770720947/waste-images/lm8gkpot3clecidgchuf.jpg",
+    "pickupRadius": 5,
+    "currentHighestBid": 550,
+    "totalBids": 1,
+    "biddingDeadline": "2026-02-11T10:56:10.453Z",
+    "status": "bidding_closed",
+    "views": 9,
+    "isUrgent": false,
+    "availableFrom": "2026-02-10T10:56:10.484Z",
+    "createdAt": "2026-02-10T10:56:10.487Z",
+    "updatedAt": "2026-02-10T15:15:44.424Z",
+    "__v": 0,
+    "acceptedBidId": "698b0ee2aee0207a3e357564",
+    "acceptedBuyerId": "69823b5f3890f8ca9b806fcc",
+    "closedAt": "2026-02-10T15:15:43.878Z"
+  },
+  "listingLocation": {
+    "type": "Point",
+    "coordinates": [
+      80.6337,
+      7.2906
+    ]
+  }
+}
