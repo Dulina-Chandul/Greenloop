@@ -9,6 +9,7 @@ import {
   Menu,
   X,
   FileText,
+  TrendingUp,
 } from "lucide-react";
 import UserMenu from "@/pages/common/UserMenu";
 
@@ -25,6 +26,7 @@ export default function CollectorLayout({ children }: CollectorLayoutProps) {
     { icon: Gavel, label: "Auctions", path: "/collector/auctions" },
     { icon: FileText, label: "My Bids", path: "/collector/my-bids" },
     { icon: DollarSign, label: "Earnings", path: "/collector/earnings" },
+    { icon: TrendingUp, label: "Analytics", path: "/collector/analytics" },
     { icon: Settings, label: "Settings", path: "/collector/settings" },
   ];
 

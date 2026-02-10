@@ -26,6 +26,8 @@ import SellerEarnings from "./pages/seller/SellerEarnings";
 import Home from "./pages/common/Home";
 import NotFound404 from "./pages/common/NotFound404";
 import Unauthorized from "./pages/common/Unauthorized";
+import SellerAnalytics from "./pages/seller/SellerAnalytics";
+import CollectorAnalytics from "./pages/collector/CollectorAnalytics";
 
 // import './App.css'
 
@@ -122,6 +124,16 @@ function App() {
         }
       />
       <Route
+        path="/seller/analytics"
+        element={
+          <ProtectedRoute allowedRoles={["seller"]}>
+            <SellerLayout>
+              <SellerAnalytics />
+            </SellerLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/seller/settings"
         element={
           <ProtectedRoute allowedRoles={["seller"]}>
@@ -169,6 +181,16 @@ function App() {
           <ProtectedRoute allowedRoles={["collector"]}>
             <CollectorLayout>
               <Profile />
+            </CollectorLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/collector/analytics"
+        element={
+          <ProtectedRoute allowedRoles={["collector"]}>
+            <CollectorLayout>
+              <CollectorAnalytics />
             </CollectorLayout>
           </ProtectedRoute>
         }
