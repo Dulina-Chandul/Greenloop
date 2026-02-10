@@ -117,6 +117,33 @@ export default function CreateListing() {
         ? aiAnalysis.category.toLowerCase()
         : "mixed";
 
+      // Get reverse geocoding
+      let address = {
+        city: "Unknown City",
+        district: "Unknown District",
+      };
+
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`,
+        );
+        const data = await response.json();
+        if (data.address) {
+          address = {
+            city:
+              data.address.city ||
+              data.address.town ||
+              data.address.village ||
+              data.address.suburb ||
+              "Unknown City",
+            district:
+              data.address.state || data.address.district || "Unknown District",
+          };
+        }
+      } catch (error) {
+        console.error("Failed to fetch address:", error);
+      }
+
       const listingData = {
         title,
         description,
@@ -128,10 +155,7 @@ export default function CreateListing() {
           type: "Point" as const,
           coordinates: [position.coords.longitude, position.coords.latitude],
         },
-        address: {
-          city: "Colombo",
-          district: "Colombo",
-        },
+        address,
         pickupRadius: 5,
         manualOverrides: {
           weight,
