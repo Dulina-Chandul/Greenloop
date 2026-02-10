@@ -128,15 +128,28 @@ export const logoutHandler = catchErrors(async (req, res) => {
 export const refreshHandler = catchErrors(async (req, res) => {
   const refreshToken = req.cookies.refreshToken as string | undefined;
 
+  console.log("Refresh Handler Called");
+  console.log("RefreshToken Cookie:", refreshToken ? "Present" : "Missing");
+
   appAssert(refreshToken, UNAUTHORIZED, "Invalid refresh token");
 
   const { payload, error } = verifyToken<RefreshTokenPayload>(refreshToken, {
     secret: refreshTokenSignOptions.secret,
   });
 
+  if (error) {
+    console.log("Token verification failed:", error);
+  }
+
   appAssert(payload, UNAUTHORIZED, "Invalid refresh token");
 
   const session = await SessionModel.findById(payload.sessionId);
+
+  if (!session) {
+    console.log("Session not found for ID:", payload.sessionId);
+  } else if (session.expiresAt.getTime() <= Date.now()) {
+    console.log("Session expired. ExpiresAt:", session.expiresAt);
+  }
 
   appAssert(
     session && session.expiresAt.getTime() > Date.now(),
