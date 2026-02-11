@@ -39,6 +39,22 @@
 - Node.js (v18 or higher recommended)
 - MongoDB (Local or Atlas)
 
+## 🧪 Test Users
+
+You can use the following credentials to log in as test users.
+
+### Seller
+
+- **Email:** `seller@greenloop.com`
+- **Password:** `password123`
+- **Phone:** `0771234567`
+
+### Collector
+
+- **Email:** `collector@greenloop.com`
+- **Password:** `password123`
+- **Phone:** `0777654321`
+
 ## ⚙️ Installation & Setup
 
 ### 1. Clone the repository

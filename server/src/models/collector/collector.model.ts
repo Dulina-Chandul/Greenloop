@@ -154,11 +154,9 @@ const collectorSchema = new mongoose.Schema<CollectorDocument>(
       type: {
         type: String,
         enum: ["Point"],
-        required: true,
       },
       coordinates: {
         type: [Number],
-        required: true,
       },
     },
     address: {

@@ -135,11 +135,9 @@ const sellerSchema = new mongoose.Schema<SellerDocument>(
       type: {
         type: String,
         enum: ["Point"],
-        required: true,
       },
       coordinates: {
         type: [Number],
-        required: true,
       },
     },
     address: {
@@ -161,11 +159,11 @@ const sellerSchema = new mongoose.Schema<SellerDocument>(
       },
       postalCode: {
         type: String,
-        required: true,
+        required: false,
       },
       street: {
         type: String,
-        required: true,
+        required: false,
       },
     },
 
