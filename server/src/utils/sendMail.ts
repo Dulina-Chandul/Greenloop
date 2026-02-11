@@ -22,7 +22,7 @@ export const sendMail = async ({ to, subject, text, html }: Params) => {
 
   return {
     data: { id: "mock-email-id" },
-    error: null,
+    error: null as any,
   };
 
   /*

@@ -109,7 +109,6 @@ const collectorSchema = new mongoose.Schema<CollectorDocument>(
     },
     password: {
       type: String,
-      unique: true,
       required: true,
     },
     verified: {
