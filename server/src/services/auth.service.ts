@@ -83,13 +83,13 @@ export const createAccount = async (data: createAccountParams) => {
   });
 
   const refreshToken = signToken(
-    { sessionId: session._id },
+    { sessionId: session._id.toString() },
     refreshTokenSignOptions,
   );
 
   const accessToken = signToken({
-    userId: userID,
-    sessionId: session._id,
+    userId: userID.toString(),
+    sessionId: session._id.toString(),
   });
 
   return {
@@ -118,14 +118,14 @@ export const loginUser = async (data: loginParams) => {
 
   //* Create Refresh Token
   const refreshToken = signToken(
-    { sessionId: session._id },
+    { sessionId: session._id.toString() },
     refreshTokenSignOptions,
   );
 
   //* Create Access Token
   const accessToken = signToken({
-    userId: user._id,
-    sessionId: session._id,
+    userId: user._id.toString(),
+    sessionId: session._id.toString(),
   });
 
   return {
@@ -159,12 +159,12 @@ export const refreshUserAccessToken = async (refreshToken: string) => {
   }
 
   const newRefreshToken = sessionNeedsRefresh
-    ? signToken({ sessionId: session._id }, refreshTokenSignOptions)
+    ? signToken({ sessionId: session._id.toString() }, refreshTokenSignOptions)
     : undefined;
 
   const accessToken = signToken({
-    userId: session.userId,
-    sessionId: session._id,
+    userId: session.userId.toString(),
+    sessionId: session._id.toString(),
   });
 
   return {
