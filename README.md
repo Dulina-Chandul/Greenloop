@@ -60,7 +60,7 @@ You can use the following credentials to log in as test users.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/greenloop.git
+git clone https://github.com/Dulina-Chandul/greenloop.git
 cd greenloop
 ```
 
