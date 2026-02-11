@@ -1,11 +1,4 @@
-import {
-  AlertCircle,
-  Calendar,
-  Mail,
-  User,
-  DollarSign,
-  Save,
-} from "lucide-react";
+import { AlertCircle, Calendar, Mail, DollarSign } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -24,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import axiosInstance from "@/config/api/axiosInstance";
@@ -119,7 +111,7 @@ const Profile = () => {
                 }}
                 disabled={isPending}
               >
-                <SelectTrigger className="w-[100px] h-8">
+                <SelectTrigger className="w-25 h-8">
                   <SelectValue placeholder="Currency" />
                 </SelectTrigger>
                 <SelectContent>

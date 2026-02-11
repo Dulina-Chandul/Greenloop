@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import {
   Plus,
@@ -58,7 +58,6 @@ const STATUS_CONFIG = {
 export default function MyListings() {
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
-  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<
     "active" | "pending" | "sold" | "expired"
   >("active");
@@ -69,16 +68,6 @@ export default function MyListings() {
     queryFn: async () => {
       const response = await axiosInstance.get("/seller/listing/my-listings");
       return response.data.listings;
-    },
-  });
-
-  // Close bidding mutation
-  const { mutate: closeBidding } = useMutation({
-    mutationFn: async (listingId: string) => {
-      await axiosInstance.put(`/listings/${listingId}/close-bidding`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["seller-listings"] });
     },
   });
 
@@ -303,7 +292,7 @@ export default function MyListings() {
           {/* Add New Item Card */}
           <button
             onClick={() => navigate("/seller/create-listing")}
-            className="bg-gray-800 rounded-lg border-2 border-dashed border-gray-700 hover:border-gray-600 transition-colors min-h-[400px] flex flex-col items-center justify-center gap-4 group"
+            className="bg-gray-800 rounded-lg border-2 border-dashed border-gray-700 hover:border-gray-600 transition-colors min-h-100 flex flex-col items-center justify-center gap-4 group"
           >
             <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center group-hover:bg-gray-600 transition-colors">
               <Plus

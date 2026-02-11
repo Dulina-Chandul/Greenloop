@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Package,
-  TrendingUp,
   DollarSign,
   Plus,
   Sparkles,
@@ -16,7 +15,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import axiosInstance from "@/config/api/axiosInstance";
+
 import { formatCurrency } from "@/config/currency";
 import { sellerListingAPI } from "@/apiservices/seller/sellerAPI";
 

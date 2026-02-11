@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axiosInstance from "@/config/api/axiosInstance";
 import { createBidAPI, getListingBidsAPI } from "@/apiservices/bid/bidAPI";
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 import { useAppSelector } from "@/redux/hooks/hooks";
 import { selectUser } from "@/redux/slices/authSlice";
 import { formatCurrency } from "@/config/currency";
@@ -35,7 +35,7 @@ export default function AuctionDetails() {
   const [progress, setProgress] = useState<number>(0);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-  const [socket, setSocket] = useState<Socket | null>(null);
+
   const [calculatedDistance, setCalculatedDistance] = useState<string>("");
 
   // Fetch listing details
@@ -112,7 +112,6 @@ export default function AuctionDetails() {
 
     const socketUrl = import.meta.env.VITE_API_URL.replace(/\/api\/v1\/?$/, "");
     const newSocket = io(socketUrl, { withCredentials: true });
-    setSocket(newSocket);
 
     newSocket.on("listing:updated", (data) => {
       if (data.listingId === id) {
@@ -683,7 +682,7 @@ export default function AuctionDetails() {
                   <div
                     className={`h-full transition-all duration-1000 ease-linear ${
                       listing.status === "active"
-                        ? "bg-gradient-to-r from-green-500 via-yellow-500 to-red-500"
+                        ? "bg-linear-to-r from-green-500 via-yellow-500 to-red-500"
                         : "bg-gray-500"
                     }`}
                     style={{ width: `${progress}%` }}

@@ -28,11 +28,11 @@ export default function CollectorDashboard() {
     return saved === "true";
   });
   const socketRef = useRef<Socket | null>(null);
-  const [manualLocation, setManualLocation] = useState<{
+  const [manualLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
-  const [useManualLocation, setUseManualLocation] = useState(false);
+  const [useManualLocation] = useState(false);
 
   // Persist live tracking state
   useEffect(() => {

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { useAppSelector } from "@/redux/hooks/hooks";
 import { selectUser } from "@/redux/slices/authSlice";
-import { Gavel, Package, DollarSign, Award, TrendingDown } from "lucide-react";
+import { Gavel, Package, DollarSign, Award } from "lucide-react";
 import axiosInstance from "@/config/api/axiosInstance";
 import { formatCurrency } from "@/config/currency";
 import {
