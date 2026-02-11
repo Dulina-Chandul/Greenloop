@@ -113,7 +113,8 @@ app.use("/api/v1/sessions", sessionRoutes);
 
 app.use(errorHandler);
 
-httpServer.listen(PORT, async () => {
-  console.log(`Server is running on port ${PORT} in ${NODE_ENV} environment`);
+const port = Number(PORT) || 4004;
+httpServer.listen(port, "0.0.0.0", async () => {
+  console.log(`Server is running on port ${port} in ${NODE_ENV} environment`);
   await connectToDatabase();
 });
