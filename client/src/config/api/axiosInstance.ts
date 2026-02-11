@@ -1,6 +1,8 @@
 import axios, { AxiosError } from "axios";
 import queryClient from "../query-client/queryClient";
 import { navigate } from "@/lib/navigation";
+import { store } from "@/redux/store/store";
+import { clearAuth } from "@/redux/slices/authSlice";
 
 interface apiErrorResponse {
   errorCode?: string;
@@ -78,6 +80,7 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         console.log("Token refresh failed:", refreshError);
         processQueue(refreshError, null);
+        store.dispatch(clearAuth());
         queryClient.clear();
         if (navigate) {
           navigate("/login", {

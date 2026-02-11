@@ -21,6 +21,7 @@ import transactionRouter from "./routes/transaction/transaction.route";
 import analyticsRouter from "./routes/analytics/analytics.route";
 
 const app = express();
+app.set("trust proxy", 1)
 const httpServer = createServer(app);
 
 io.attach(httpServer, {
