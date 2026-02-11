@@ -15,6 +15,17 @@ const getToEmail = (to: string) =>
   NODE_ENV === "development" ? "delivered@resend.dev" : to;
 
 export const sendMail = async ({ to, subject, text, html }: Params) => {
+  // Mock email sending as per user request (no Resend API usage)
+  console.log(`[MOCK EMAIL] To: ${to}`);
+  console.log(`[MOCK EMAIL] Subject: ${subject}`);
+  console.log(`[MOCK EMAIL] Body: ${text || html}`);
+
+  return {
+    data: { id: "mock-email-id" },
+    error: null,
+  };
+
+  /*
   return await resend.emails.send({
     from: getFromEmail(),
     to: getToEmail(to),
@@ -22,4 +33,5 @@ export const sendMail = async ({ to, subject, text, html }: Params) => {
     text,
     html,
   });
+  */
 };
