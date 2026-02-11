@@ -210,7 +210,7 @@ export default function MyBids() {
                           </a>
                           <div className="flex items-start gap-2 text-sm text-gray-300 p-2 bg-gray-900/50 rounded">
                             <MapPin size={14} className="mt-1 shrink-0" />
-                            <span className="break-words">
+                            <span className="wrap-break-word">
                               {bid.listingId.sellerId.address?.street},{" "}
                               {bid.listingId.sellerId.address?.city}
                             </span>

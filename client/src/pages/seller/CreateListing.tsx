@@ -355,7 +355,7 @@ export default function CreateListing() {
                   placeholder="Describe the condition and any additional details..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="mt-2 w-full bg-gray-700 border border-gray-600 rounded-md p-3 min-h-[100px] text-white placeholder:text-gray-400"
+                  className="mt-2 w-full bg-gray-700 border border-gray-600 rounded-md p-3 min-h-25 text-white placeholder:text-gray-400"
                 />
               </div>
 
