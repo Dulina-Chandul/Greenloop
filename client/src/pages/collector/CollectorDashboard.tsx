@@ -175,28 +175,34 @@ export default function CollectorDashboard() {
   ];
 
   return (
-    <div className="h-full overflow-y-auto bg-gray-900 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="h-full overflow-y-auto bg-gray-950 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
+        <div className="pt-1">
+          <h1 className="text-2xl font-bold text-white tracking-tight">
             Welcome back, {user?.firstName || "Collector"}! 👋
           </h1>
-          <p className="text-gray-400">
+          <p className="text-gray-500 text-sm mt-1">
             Here's what's happening with your collections today
           </p>
         </div>
 
         {/* Live Tracking Toggle */}
-        <div className="mb-6 bg-gray-800 p-5 rounded-lg border border-gray-700 flex items-center justify-between">
+        <div
+          className={`p-4 rounded-2xl border flex items-center justify-between transition-all duration-200 ${
+            isLiveTracking
+              ? "bg-emerald-500/5 border-emerald-500/25"
+              : "bg-gray-900 border-gray-800"
+          }`}
+        >
           <div className="flex-1">
-            <h3 className="text-white font-semibold flex items-center gap-2 mb-1">
+            <h3 className="text-white font-semibold flex items-center gap-2 text-sm mb-0.5">
               <span
-                className={`w-3 h-3 rounded-full ${isLiveTracking ? "bg-green-500 animate-pulse" : "bg-gray-500"}`}
+                className={`w-2.5 h-2.5 rounded-full ${isLiveTracking ? "bg-emerald-500 animate-pulse" : "bg-gray-600"}`}
               ></span>
               Live Vehicle Tracking
             </h3>
-            <p className="text-sm text-gray-400">
+            <p className="text-xs text-gray-500 ml-[18px]">
               Share your real-time location while collecting scrap
             </p>
             {/* {location && isLiveTracking && (
@@ -214,7 +220,7 @@ export default function CollectorDashboard() {
               </div>
             )} */}
             {geoError && (
-              <p className="text-xs text-red-400 mt-1">⚠️ {geoError}</p>
+              <p className="text-xs text-red-400 mt-1 ml-[18px]">⚠️ {geoError}</p>
             )}
           </div>
           <div className="flex items-center space-x-2">
@@ -228,50 +234,50 @@ export default function CollectorDashboard() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
               <div
                 key={index}
-                className="bg-gray-800 rounded-lg p-6 border border-gray-700"
+                className="bg-gray-900 rounded-2xl p-5 border border-gray-800 hover:border-gray-700 transition-colors"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`${stat.color} p-3 rounded-lg`}>
-                    <Icon className="text-white" size={24} />
+                  <div className={`${stat.color} bg-opacity-20 p-2.5 rounded-xl`}>
+                    <Icon className="text-white" size={18} />
                   </div>
                 </div>
-                <h3 className="text-gray-400 text-sm mb-1">{stat.label}</h3>
-                <p className="text-3xl font-bold text-white mb-2">
+                <h3 className="text-gray-500 text-xs font-semibold tracking-wider uppercase mb-1.5">{stat.label}</h3>
+                <p className="text-3xl font-bold text-white tabular-nums mb-1.5">
                   {stat.value}
                 </p>
-                <p className="text-green-400 text-sm">{stat.change}</p>
+                <p className="text-emerald-400 text-xs font-medium">{stat.change}</p>
               </div>
             );
           })}
         </div>
 
         {/* Active Bids & Recent Wins */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Active Bids */}
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-white">Active Bids</h2>
-              <span className="text-sm text-gray-400">
+          <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800/80">
+              <h2 className="text-white font-semibold text-sm">Active Bids</h2>
+              <span className="text-xs text-gray-500 bg-gray-800 px-2.5 py-1 rounded-full">
                 {activeBids.length} active
               </span>
             </div>
-            <div className="space-y-3">
+            <div className="p-3 space-y-2">
               {activeBids.length === 0 ? (
-                <div className="text-center py-8">
-                  <Hammer className="mx-auto text-gray-600 mb-2" size={48} />
-                  <p className="text-gray-400 text-sm">No active bids</p>
+                <div className="text-center py-10">
+                  <Hammer className="mx-auto text-gray-700 mb-3" size={36} />
+                  <p className="text-gray-500 text-sm">No active bids</p>
                 </div>
               ) : (
                 activeBids.slice(0, 3).map((bid: any) => (
                   <div
                     key={bid._id}
-                    className="flex items-center gap-4 p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"
+                    className="flex items-center gap-3 p-3 bg-gray-800/50 hover:bg-gray-800 rounded-xl cursor-pointer transition-colors"
                     onClick={() =>
                       navigate(`/collector/auctions/${bid.listingId._id}`)
                     }
@@ -279,24 +285,24 @@ export default function CollectorDashboard() {
                     <img
                       src={bid.listingId?.primaryImage}
                       alt={bid.listingId?.title}
-                      className="w-12 h-12 rounded object-cover"
+                      className="w-11 h-11 rounded-xl object-cover shrink-0"
                     />
                     <div className="flex-1 min-w-0">
                       <h3 className="text-white font-medium text-sm truncate">
                         {bid.listingId?.title}
                       </h3>
-                      <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
-                        <MapPin size={12} />
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-0.5">
+                        <MapPin size={10} />
                         <span>
                           {bid.collectorInfo?.distance.toFixed(1)} km away
                         </span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-green-400 font-semibold">
+                    <div className="text-right shrink-0">
+                      <p className="text-emerald-400 font-bold text-sm">
                         {formatCurrency(bid.amount, user?.currency)}
                       </p>
-                      <p className="text-gray-400 text-xs">Your bid</p>
+                      <p className="text-gray-600 text-xs">Your bid</p>
                     </div>
                   </div>
                 ))
@@ -305,40 +311,40 @@ export default function CollectorDashboard() {
           </div>
 
           {/* Recent Wins - NOW CLICKABLE */}
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-white">Recent Wins</h2>
-              <span className="text-sm text-gray-400">
+          <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800/80">
+              <h2 className="text-white font-semibold text-sm">Recent Wins</h2>
+              <span className="text-xs text-gray-500 bg-gray-800 px-2.5 py-1 rounded-full">
                 {wonBids.length} won
               </span>
             </div>
-            <div className="space-y-3">
+            <div className="p-3 space-y-2">
               {wonBids.length === 0 ? (
-                <div className="text-center py-8">
-                  <Award className="mx-auto text-gray-600 mb-2" size={48} />
-                  <p className="text-gray-400 text-sm">No won auctions yet</p>
+                <div className="text-center py-10">
+                  <Award className="mx-auto text-gray-700 mb-3" size={36} />
+                  <p className="text-gray-500 text-sm">No won auctions yet</p>
                 </div>
               ) : (
                 wonBids.slice(0, 3).map((bid: any) => (
                   <div
                     key={bid._id}
-                    className="bg-gray-700 rounded-lg p-4 cursor-pointer hover:bg-gray-600 transition-colors"
+                    className="bg-gray-800/50 hover:bg-gray-800 rounded-xl p-3.5 cursor-pointer transition-colors"
                   >
-                    <div className="flex items-center gap-4 mb-3">
+                    <div className="flex items-center gap-3 mb-3">
                       <img
                         src={bid.listingId?.primaryImage}
                         alt={bid.listingId?.title}
-                        className="w-16 h-16 rounded object-cover"
+                        className="w-12 h-12 rounded-xl object-cover shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <h3 className="text-white font-medium text-sm truncate mb-1">
                           {bid.listingId?.title}
                         </h3>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-gray-500">
                             Won {new Date(bid.respondedAt).toLocaleDateString()}
                           </span>
-                          <span className="text-green-400 font-bold">
+                          <span className="text-emerald-400 font-bold text-sm">
                             {formatCurrency(bid.amount, user?.currency)}
                           </span>
                         </div>
@@ -347,19 +353,19 @@ export default function CollectorDashboard() {
 
                     {/* Seller Contact Info */}
                     {bid.listingId?.sellerId && (
-                      <div className="border-t border-gray-600 pt-3 space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-gray-300">
-                          <User size={14} className="text-gray-400" />
+                      <div className="border-t border-gray-700/60 pt-3 space-y-2">
+                        <div className="flex items-center gap-2 text-xs text-gray-400">
+                          <User size={12} className="text-gray-600" />
                           <span>
                             {bid.listingId.sellerId.firstName}{" "}
                             {bid.listingId.sellerId.lastName}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Phone size={14} className="text-gray-400" />
+                          <Phone size={12} className="text-gray-600" />
                           <a
                             href={`tel:${bid.listingId.sellerId.phoneNumber}`}
-                            className="text-green-400 hover:text-green-300 text-sm"
+                            className="text-emerald-400 hover:text-emerald-300 text-xs transition-colors"
                             onClick={(e) => e.stopPropagation()}
                           >
                             {bid.listingId.sellerId.phoneNumber}
@@ -372,9 +378,9 @@ export default function CollectorDashboard() {
                               `/collector/auctions/${bid.listingId._id}`,
                             );
                           }}
-                          className="w-full mt-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded transition-colors flex items-center justify-center gap-2"
+                          className="w-full mt-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5"
                         >
-                          <Eye size={14} />
+                          <Eye size={12} />
                           View Full Details
                         </button>
                       </div>

@@ -23,37 +23,37 @@ import { sellerListingAPI } from "@/apiservices/seller/sellerAPI";
 const STATUS_CONFIG = {
   active: {
     label: "BIDDING LIVE",
-    color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/50",
+    color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
     icon: Clock,
     dotColor: "bg-emerald-400",
   },
   sold: {
     label: "SOLD",
-    color: "bg-blue-500/20 text-blue-400 border-blue-500/50",
+    color: "bg-blue-500/10 text-blue-400 border-blue-500/30",
     icon: CheckCircle2,
     dotColor: "bg-blue-400",
   },
   bidding_closed: {
     label: "PENDING PICKUP",
-    color: "bg-amber-500/20 text-amber-400 border-amber-500/50",
+    color: "bg-amber-500/10 text-amber-400 border-amber-500/30",
     icon: AlertCircle,
     dotColor: "bg-amber-400",
   },
   draft: {
     label: "ANALYZING",
-    color: "bg-purple-500/20 text-purple-400 border-purple-500/50",
+    color: "bg-purple-500/10 text-purple-400 border-purple-500/30",
     icon: Sparkles,
     dotColor: "bg-purple-400",
   },
   cancelled: {
     label: "CANCELLED",
-    color: "bg-red-500/20 text-red-400 border-red-500/50",
+    color: "bg-red-500/10 text-red-400 border-red-500/30",
     icon: XCircle,
     dotColor: "bg-red-400",
   },
   expired: {
     label: "EXPIRED",
-    color: "bg-gray-500/20 text-gray-400 border-gray-500/50",
+    color: "bg-gray-500/10 text-gray-400 border-gray-500/30",
     icon: XCircle,
     dotColor: "bg-gray-400",
   },
@@ -83,10 +83,10 @@ export default function SellerDashboard() {
 
     return (
       <span
-        className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${config.color} flex items-center gap-1.5 w-fit`}
+        className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider border ${config.color} flex items-center gap-1.5 w-fit uppercase`}
       >
         <span
-          className={`w-2 h-2 rounded-full ${config.dotColor} ${status === "active" ? "animate-pulse" : ""}`}
+          className={`w-1.5 h-1.5 rounded-full ${config.dotColor} ${status === "active" ? "animate-pulse" : ""}`}
         />
         {config.label}
       </span>
@@ -94,80 +94,80 @@ export default function SellerDashboard() {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-gray-900">
+    <div className="h-full overflow-y-auto bg-gray-950">
       {/* Hero Section */}
-      <div className="relative bg-linear-to-br from-gray-800 via-gray-900 to-gray-900 border-b border-gray-700">
-        <div className="absolute inset-0 opacity-10">
+      <div className="relative overflow-hidden border-b border-gray-800/60">
+        <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=1920"
             alt="Background"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover opacity-[0.07]"
           />
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-950/95 to-gray-950/80" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-6 py-12">
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm font-semibold border border-green-500 flex items-center gap-1">
-                <Sparkles size={14} />
+        <div className="relative max-w-7xl mx-auto px-6 py-10">
+          <div className="mb-7">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold tracking-widest border border-emerald-500/20 flex items-center gap-1.5 uppercase">
+                <Sparkles size={11} />
                 AI POWERED
               </span>
             </div>
-            <h1 className="text-5xl font-bold text-white mb-4">
-              Turn Waste Into <span className="text-green-400">Cash</span>
+            <h1 className="text-4xl font-bold text-white mb-3 tracking-tight">
+              Turn Waste Into{" "}
+              <span className="text-emerald-400">Cash</span>
             </h1>
-            <p className="text-xl text-gray-400 max-w-2xl">
+            <p className="text-gray-400 max-w-xl text-sm leading-relaxed">
               Use our advanced AI to identify recyclables instantly from your
               camera. Get accurate pricing estimates and list items in seconds.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-3">
             <Button
               onClick={() => navigate("/seller/create-listing")}
-              className="bg-green-600 hover:bg-green-700 h-14 px-8 text-lg"
+              className="bg-emerald-600 hover:bg-emerald-500 h-11 px-6 text-sm font-semibold rounded-xl shadow-lg shadow-emerald-900/40 transition-all"
             >
-              <Plus className="mr-1" size={20} />
+              <Plus className="mr-1.5" size={16} />
               Create New Listing
             </Button>
             <Button
               variant="outline"
-              className="h-14 px-8 text-lg hover:border-green-800 hover:bg-transparent hover:text-green-400"
+              className="h-11 px-6 text-sm border-gray-700 text-gray-300 hover:border-gray-600 hover:bg-gray-800 hover:text-white rounded-xl transition-all"
             >
-              <Play className="mr-2" size={20} />
+              <Play className="mr-1.5" size={15} />
               Watch Tutorial
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Stats about the seller */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+      <div className="max-w-7xl mx-auto px-6 py-7 space-y-6">
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800 hover:border-blue-500/30 transition-colors group">
             <div className="flex items-center justify-between mb-4">
-              <div className="bg-blue-500/20 p-3 rounded-lg">
-                <Eye className="text-blue-400" size={24} />
+              <div className="bg-blue-500/10 p-2.5 rounded-xl">
+                <Eye className="text-blue-400" size={18} />
               </div>
               {/* // TODO : Change the updated time later */}
-              {/* <span className="text-xs text-gray-400">Updated 2m ago</span> */}
             </div>
-            <h3 className="text-gray-400 text-sm mb-1">Active Listings</h3>
-            <p className="text-4xl font-bold text-white">
+            <p className="text-gray-500 text-xs font-semibold tracking-wider uppercase mb-1.5">Active Listings</p>
+            <p className="text-4xl font-bold text-white tabular-nums">
               {activeListings.length}
             </p>
           </div>
 
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800 hover:border-orange-500/30 transition-colors group">
             <div className="flex items-center justify-between mb-4">
-              <div className="bg-orange-500/20 p-3 rounded-lg">
-                <Package className="text-orange-400" size={24} />
+              <div className="bg-orange-500/10 p-2.5 rounded-xl">
+                <Package className="text-orange-400" size={18} />
               </div>
               {/* // TODO : Change this later */}
-              {/* <span className="text-xs text-red-400">Action required</span> */}
             </div>
-            <h3 className="text-gray-400 text-sm mb-1">Pending Bids</h3>
-            <p className="text-4xl font-bold text-white">
+            <p className="text-gray-500 text-xs font-semibold tracking-wider uppercase mb-1.5">Pending Bids</p>
+            <p className="text-4xl font-bold text-white tabular-nums">
               {activeListings.reduce(
                 (sum: number, list: any) => sum + (list.totalBids || 0),
                 0,
@@ -175,83 +175,78 @@ export default function SellerDashboard() {
             </p>
           </div>
 
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800 hover:border-emerald-500/30 transition-colors group">
             <div className="flex items-center justify-between mb-4">
-              <div className="bg-green-500/20 p-3 rounded-lg">
-                <DollarSign className="text-green-400" size={24} />
+              <div className="bg-emerald-500/10 p-2.5 rounded-xl">
+                <DollarSign className="text-emerald-400" size={18} />
               </div>
               {/* // TODO : Change the percentage later */}
-              {/* <span className="text-xs text-green-400 flex items-center gap-1">
-                <TrendingUp size={12} />
-                +12%
-              </span> */}
             </div>
-            <h3 className="text-gray-400 text-sm mb-1">Total Earnings</h3>
-            <div className="text-2xl font-bold text-white mb-1">
+            <p className="text-gray-500 text-xs font-semibold tracking-wider uppercase mb-1.5">Total Earnings</p>
+            <div className="text-2xl font-bold text-white">
               {formatCurrency(totalEarnings, user?.currency)}
             </div>
           </div>
         </div>
 
-        {/* Recent activity */}
-        <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-          <div className="flex items-center justify-between p-6 border-b border-gray-700">
-            <h2 className="text-xl font-bold text-white">Recent Activity</h2>
+        {/* Recent Activity */}
+        <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800/80">
+            <h2 className="text-white font-semibold">Recent Activity</h2>
             <Link
               to="/seller/listings"
-              className="text-green-400 hover:text-green-300 text-sm font-medium"
+              className="text-emerald-400 hover:text-emerald-300 text-xs font-semibold flex items-center gap-1 transition-colors"
             >
               View All →
             </Link>
           </div>
 
           {listings.length === 0 ? (
-            <div className="p-12 text-center">
-              <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Package className="text-gray-400" size={32} />
+            <div className="p-14 text-center">
+              <div className="w-14 h-14 bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Package className="text-gray-600" size={26} />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">
+              <h3 className="text-white font-semibold mb-1.5">
                 No listings yet
               </h3>
-              <p className="text-gray-400 mb-6">
+              <p className="text-gray-500 text-sm mb-6">
                 Create your first listing to start selling recyclables
               </p>
               <Button
                 onClick={() => navigate("/seller/create-listing")}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-emerald-600 hover:bg-emerald-500 rounded-xl h-10 px-5 text-sm"
               >
-                <Plus className="mr-2" size={18} />
+                <Plus className="mr-1.5" size={15} />
                 Create Your First Listing
               </Button>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-900/50">
-                  <tr>
-                    <th className="text-left p-4 text-sm font-medium text-gray-400">
+                <thead>
+                  <tr className="border-b border-gray-800/60">
+                    <th className="text-left px-6 py-3 text-gray-500 text-xs font-semibold tracking-wider uppercase">
                       Item Name
                     </th>
-
-                    <th className="text-left p-4 text-sm font-medium text-gray-400">
+                    <th className="text-left px-4 py-3 text-gray-500 text-xs font-semibold tracking-wider uppercase">
                       Category
                     </th>
-                    <th className="text-left p-4 text-sm font-medium text-gray-400">
+                    <th className="text-left px-4 py-3 text-gray-500 text-xs font-semibold tracking-wider uppercase">
                       Date Listed
                     </th>
-                    <th className="text-left p-4 text-sm font-medium text-gray-400">
+                    <th className="text-left px-4 py-3 text-gray-500 text-xs font-semibold tracking-wider uppercase">
                       Status
                     </th>
-                    <th className="text-right p-4 text-sm font-medium text-gray-400">
+                    <th className="text-right px-6 py-3 text-gray-500 text-xs font-semibold tracking-wider uppercase">
                       Current Bid/Price
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-700">
+                <tbody className="divide-y divide-gray-800/50">
                   {listings.slice(0, 5).map((listing: any) => (
                     <tr
                       key={listing._id}
-                      className="hover:bg-gray-700/30 transition-colors cursor-pointer"
+                      className="hover:bg-gray-800/40 transition-colors cursor-pointer"
                       onClick={() => {
                         if (
                           listing.status === "sold" ||
@@ -264,35 +259,35 @@ export default function SellerDashboard() {
                         }
                       }}
                     >
-                      <td className="p-4">
+                      <td className="px-6 py-3.5">
                         <div className="flex items-center gap-3">
                           <img
                             src={listing.primaryImage}
                             alt={listing.title}
-                            className="w-12 h-12 rounded object-cover"
+                            className="w-11 h-11 rounded-xl object-cover"
                           />
                           <div>
-                            <p className="text-white font-medium">
+                            <p className="text-white text-sm font-medium">
                               {listing.title}
                             </p>
-                            <p className="text-gray-400 text-xs">
+                            <p className="text-gray-500 text-xs mt-0.5">
                               {listing.finalWeight} kg
                             </p>
                           </div>
                         </div>
                       </td>
 
-                      <td className="p-4">
-                        <span className="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs capitalize">
+                      <td className="px-4 py-3.5">
+                        <span className="bg-gray-800 text-gray-300 border border-gray-700 px-2.5 py-1 rounded-lg text-xs capitalize font-medium">
                           {listing.category}
                         </span>
                       </td>
-                      <td className="p-4 text-gray-400 text-sm">
+                      <td className="px-4 py-3.5 text-gray-500 text-sm">
                         {new Date(listing.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="p-4">{getStatusBadge(listing.status)}</td>
-                      <td className="p-4 text-right">
-                        <p className="font-semibold text-white">
+                      <td className="px-4 py-3.5">{getStatusBadge(listing.status)}</td>
+                      <td className="px-6 py-3.5 text-right">
+                        <p className="font-semibold text-white text-sm">
                           {formatCurrency(
                             listing.currentHighestBid ||
                               listing.finalValue ||
@@ -300,7 +295,7 @@ export default function SellerDashboard() {
                             user?.currency,
                           )}
                         </p>
-                        <p className="text-gray-400 text-xs">
+                        <p className="text-gray-600 text-xs mt-0.5">
                           {listing.status === "sold"
                             ? "Final Price"
                             : "Est. Value"}
