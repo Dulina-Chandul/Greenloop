@@ -241,6 +241,17 @@ export default function AuctionDetails() {
       (b: any) => b.bidderId._id === user?._id && b.status === "pending",
     );
 
+    // Check if deadline passed
+    if (
+      listing?.biddingDeadline &&
+      new Date() > new Date(listing.biddingDeadline)
+    ) {
+      setToastMessage("Bidding has ended for this listing");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      return;
+    }
+
     if (bidAmount <= (listing?.currentHighestBid || 0) && !myBid) {
       // Allow updating to same amount? No, must be higher usually unless just updating time/msg. But logic says new bid > current highest?
       // Actually if I am highest bidder I might want to increase my bid?
@@ -621,7 +632,9 @@ export default function AuctionDetails() {
                     disabled={
                       isPending ||
                       bidAmount <= (listing.currentHighestBid || 0) ||
-                      listing.status !== "active"
+                      listing.status !== "active" ||
+                      (listing.biddingDeadline &&
+                        new Date() > new Date(listing.biddingDeadline))
                     }
                     className="w-full bg-green-600 hover:bg-green-700 h-12 text-lg font-semibold"
                   >

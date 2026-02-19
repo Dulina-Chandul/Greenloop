@@ -40,6 +40,11 @@ export const bidController = {
       "Listing is not active",
     );
 
+    // Check if bidding has ended
+    if (listing.biddingDeadline && new Date() > listing.biddingDeadline) {
+      appAssert(false, BAD_REQUEST, "Bidding has ended for this listing");
+    }
+
     // Check if collector already has a bid on this listing (any status)
     let bid = await BidModel.findOne({
       listingId: data.listingId,
@@ -247,6 +252,11 @@ export const bidController = {
       BAD_REQUEST,
       "Listing is not active",
     );
+
+    // Check if bidding has ended
+    if (listing.biddingDeadline && new Date() > listing.biddingDeadline) {
+      appAssert(false, BAD_REQUEST, "Bidding has ended for this listing");
+    }
 
     // Update bid amount
     bid.amount = amount;
