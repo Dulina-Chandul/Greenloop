@@ -5,7 +5,6 @@ import {
   Plus,
   Lightbulb,
   TrendingUp,
-  Eye,
   X,
   ChevronRight,
   Leaf,
@@ -39,9 +38,9 @@ interface AttachedImage {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const TRENDING_QUESTIONS = [
-  { question: "How to recycle pizza boxes?", views: "1.2k views" },
-  { question: "Is bubble wrap recyclable?", views: "980 views" },
-  { question: "Upcycling ideas for old denim jeans", views: "856 views" },
+  { question: "How to recycle pizza boxes?" },
+  { question: "Is bubble wrap recyclable?" },
+  { question: "Upcycling ideas for old denim jeans" },
 ];
 
 const DID_YOU_KNOW = {
@@ -654,9 +653,6 @@ export default function EcoMate() {
               >
                 <p className="text-gray-200 text-sm font-medium group-hover:text-green-400 transition-colors leading-snug">
                   {item.question}
-                </p>
-                <p className="text-gray-500 text-xs mt-1 flex items-center gap-1">
-                  <Eye size={11} /> {item.views}
                 </p>
               </button>
             ))}
