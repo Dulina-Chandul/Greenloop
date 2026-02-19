@@ -1,6 +1,6 @@
 import { Routes, Route, useNavigate } from "react-router";
 import Login from "./pages/seller/Login";
-import Register from "./pages/seller/Register";
+import Register from "./pages/seller/SellerRegister";
 import VerifyEmail from "./pages/common/VerifyEmail";
 import ForgotPassword from "./pages/common/ForgotPassword";
 import ResetPassword from "./pages/common/ResetPassword";

@@ -5,8 +5,15 @@ import { Link, useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useAppDispatch } from "@/redux/hooks/hooks";
-import { registerCollectorAPI } from "@/apiservices/collector/collectorAPI";
+import { sellerRegisterAPI } from "@/apiservices/seller/sellerAPI";
 
 const Field = ({
   label,
@@ -51,26 +58,28 @@ const SectionHeading = ({
   </div>
 );
 
-const CollectorRegister = () => {
+const Register = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  //* Collector registraition info
+  //* Form registraition info
   // TODO : use formik later to improve the form validation
 
+  //* Seller informations
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [accountType, setAccountType] = useState<"household" | "business">("household");
 
+  //* Seller address and buisness details
   const [province, setProvince] = useState("");
   const [district, setDistrict] = useState("");
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [street, setStreet] = useState("");
-
   const [businessName, setBusinessName] = useState("");
   const [businessRegistration, setBusinessRegistration] = useState("");
 
@@ -87,7 +96,9 @@ const CollectorRegister = () => {
     phoneNumber &&
     province &&
     district &&
-    city;
+    city &&
+    (accountType === "household" ||
+      (accountType === "business" && businessName));
 
   const {
     mutateAsync: register,
@@ -95,9 +106,9 @@ const CollectorRegister = () => {
     isError,
     error,
   } = useMutation({
-    mutationKey: ["register-collector"],
+    mutationKey: ["register-seller"],
     mutationFn: () =>
-      registerCollectorAPI(
+      sellerRegisterAPI(
         {
           email,
           password,
@@ -105,14 +116,16 @@ const CollectorRegister = () => {
           firstName,
           lastName,
           phoneNumber,
+          accountType,
           address: { province, district, city, postalCode, street },
-          ...(businessName && { businessName }),
-          ...(businessRegistration && { businessRegistration }),
+          ...(accountType === "business" && {
+            businessInfo: { businessName, businessRegistration },
+          }),
         },
         dispatch,
       ),
     onSuccess: () => {
-      navigate("/collector/dashboard", { replace: true });
+      navigate("/seller/dashboard", { replace: true });
     },
   });
 
@@ -133,8 +146,8 @@ const CollectorRegister = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
 
-      {/* ── Left branding panel — half page, matching Login & Register ── */}
-      <div className="hidden lg:flex lg:w-1/2 flex-shrink-0 bg-gradient-to-br from-green-500 via-brand-200 to-brand-100 flex-col items-center justify-center p-12 relative overflow-hidden">
+      {/* ── Left branding panel — half page, same as Login ── */}
+      <div className="hidden lg:flex lg:w-1/2 flex-shrink-0 bg-gradient-to-br from-green-500 via-brand-800 to-brand-700 flex-col items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-brand-600/30 rounded-full blur-3xl" />
         <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-brand-500/20 rounded-full blur-3xl" />
 
@@ -153,19 +166,19 @@ const CollectorRegister = () => {
           <div className="space-y-3">
             <h2 className="text-4xl font-bold text-white leading-tight">
               Become a<br />
-              <span className="text-brand-300">Collector</span>
+              <span className="text-brand-300">Seller</span>
             </h2>
             <p className="text-brand-200/80 text-base leading-relaxed">
-              Browse local listings, bid competitively, and build a reliable income from recyclable waste.
+              List your recyclables, receive competitive bids, and get paid — all from your doorstep.
             </p>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 w-full">
             {[
-              { value: "1K+", label: "Collectors" },
-              { value: "AI", label: "Matched" },
-              { value: "35%", label: "More Income" },
+              { value: "7K+", label: "Tons/Day" },
+              { value: "AI", label: "Powered" },
+              { value: "3×", label: "Faster Pickup" },
             ].map((stat) => (
               <div key={stat.label} className="bg-white/10 backdrop-blur rounded-xl p-3 border border-white/10">
                 <div className="text-xl font-bold text-white">{stat.value}</div>
@@ -176,7 +189,7 @@ const CollectorRegister = () => {
 
           {/* Feature pills */}
           <div className="flex flex-wrap gap-2 justify-center">
-            {["🗺️ Local Listings", "⚡ Live Bids", "🏆 Reputation", "📊 Route Optimizer"].map((f) => (
+            {["📸 AI Identification", "💰 Competitive Bids", "🚛 Doorstep Pickup", "🌍 Eco Impact"].map((f) => (
               <span key={f} className="px-3 py-1 text-xs bg-white/10 text-brand-200 rounded-full border border-white/15 backdrop-blur">
                 {f}
               </span>
@@ -216,8 +229,8 @@ const CollectorRegister = () => {
 
         <div className="w-full max-w-lg space-y-2">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Create Collector Account</h1>
-            <p className="text-sm text-gray-500 mt-1">Fill in your details to start collecting recyclables</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Create Seller Account</h1>
+            <p className="text-sm text-gray-500 mt-1">Fill in your details to start listing your recyclables</p>
           </div>
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8 space-y-8 mt-4">
@@ -260,34 +273,36 @@ const CollectorRegister = () => {
                   <Input id="phoneNumber" type="tel" placeholder="0771234567" value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)} disabled={isPending} className={inputCls} />
                 </Field>
+                <Field label="Account Type" htmlFor="accountType">
+                  <Select value={accountType} onValueChange={(val) => setAccountType(val as "household" | "business")}>
+                    <SelectTrigger className={inputCls}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="household">🏠 Household</SelectItem>
+                      <SelectItem value="business">🏢 Business</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                {accountType === "business" && (
+                  <div className="rounded-xl bg-brand-50 border border-brand-100 p-4 space-y-4">
+                    <p className="text-xs font-semibold text-brand-700 uppercase tracking-wide">Business Information</p>
+                    <Field label="Business Name" htmlFor="businessName">
+                      <Input id="businessName" value={businessName} onChange={(e) => setBusinessName(e.target.value)}
+                        disabled={isPending} className={inputCls} />
+                    </Field>
+                    <Field label="Business Registration Number" htmlFor="businessRegistration" optional>
+                      <Input id="businessRegistration" value={businessRegistration}
+                        onChange={(e) => setBusinessRegistration(e.target.value)} disabled={isPending} className={inputCls} />
+                    </Field>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* ── Section 2: Business Info (Optional) ── */}
+            {/* ── Section 2: Address ── */}
             <div>
-              <SectionHeading step={2} title="Business Information" icon={
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              } />
-              <div className="rounded-xl bg-brand-50 border border-brand-100 p-4 space-y-4">
-                <p className="text-xs text-brand-700 font-medium">
-                  If you operate a collection business, add those details below — otherwise leave blank.
-                </p>
-                <Field label="Business Name" htmlFor="businessName" optional>
-                  <Input id="businessName" placeholder="Your collection business name" value={businessName}
-                    onChange={(e) => setBusinessName(e.target.value)} disabled={isPending} className={inputCls} />
-                </Field>
-                <Field label="Business Registration Number" htmlFor="businessRegistration" optional>
-                  <Input id="businessRegistration" placeholder="Registration number" value={businessRegistration}
-                    onChange={(e) => setBusinessRegistration(e.target.value)} disabled={isPending} className={inputCls} />
-                </Field>
-              </div>
-            </div>
-
-            {/* ── Section 3: Service Area ── */}
-            <div>
-              <SectionHeading step={3} title="Service Area" icon={
+              <SectionHeading step={2} title="Address" icon={
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -321,9 +336,9 @@ const CollectorRegister = () => {
               </div>
             </div>
 
-            {/* ── Section 4: Security ── */}
+            {/* ── Section 3: Security ── */}
             <div>
-              <SectionHeading step={4} title="Security" icon={
+              <SectionHeading step={3} title="Security" icon={
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
@@ -379,7 +394,7 @@ const CollectorRegister = () => {
                     </svg>
                     Creating account…
                   </span>
-                ) : "Create Collector Account"}
+                ) : "Create Seller Account"}
               </Button>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-sm text-gray-500">
@@ -387,8 +402,8 @@ const CollectorRegister = () => {
                   <Link to="/login" className="font-semibold text-brand-600 hover:text-brand-700 hover:underline">Sign in</Link>
                 </span>
                 <span className="hidden sm:inline text-gray-300">·</span>
-                <span>Want to sell instead?{" "}
-                  <Link to="/seller/register" className="font-semibold text-brand-600 hover:text-brand-700 hover:underline">Register as Seller</Link>
+                <span>Want to collect instead?{" "}
+                  <Link to="/collector/register" className="font-semibold text-brand-600 hover:text-brand-700 hover:underline">Register as Collector</Link>
                 </span>
               </div>
             </div>
@@ -401,4 +416,4 @@ const CollectorRegister = () => {
   );
 };
 
-export default CollectorRegister;
+export default Register;
