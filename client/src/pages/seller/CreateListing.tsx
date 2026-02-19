@@ -63,8 +63,12 @@ export default function CreateListing() {
         data.data.aiAnalysis.detectedMaterials.map((m: any) => m.materialType),
       );
       setDescription(data.data.aiAnalysis.description);
+      const category = data.data.aiAnalysis.category;
+      const capitalizedCategory =
+        category.charAt(0).toUpperCase() + category.slice(1);
+
       setTitle(
-        `${data.data.aiAnalysis.category} Waste - ${data.data.aiAnalysis.totalEstimatedWeight}kg`,
+        `${capitalizedCategory} Waste - ${data.data.aiAnalysis.totalEstimatedWeight}kg`,
       );
       setStep(2);
     },
