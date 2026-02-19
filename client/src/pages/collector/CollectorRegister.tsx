@@ -367,7 +367,7 @@ const CollectorRegister = () => {
             {/* ── Submit ── */}
             <div className="space-y-4 pt-2">
               <Button
-                className="w-full h-11 rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-semibold text-sm shadow-sm shadow-brand-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-11 rounded-xl bg-green-500 hover:bg-brand-700 active:bg-brand-800 text-gray-900 font-semibold text-sm shadow-sm shadow-brand-200 transition-all disabled:opacity-100 disabled:cursor-not-allowed"
                 disabled={!isFormValid || isPending}
                 onClick={() => register()}
               >
