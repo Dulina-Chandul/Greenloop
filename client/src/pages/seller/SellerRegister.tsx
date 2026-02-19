@@ -58,7 +58,7 @@ const SectionHeading = ({
   </div>
 );
 
-const SellerRegister = () => {
+const Register = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -147,7 +147,7 @@ const SellerRegister = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
 
       {/* ── Left branding panel — half page, same as Login ── */}
-      <div className="hidden lg:flex lg:w-1/2 flex-shrink-0 bg-gradient-to-br from-green-900 via-brand-800 to-brand-700 flex-col items-center justify-center p-12 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 flex-shrink-0 bg-gradient-to-br from-green-500 via-brand-800 to-brand-700 flex-col items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-brand-600/30 rounded-full blur-3xl" />
         <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-brand-500/20 rounded-full blur-3xl" />
 
@@ -187,7 +187,7 @@ const SellerRegister = () => {
             ))}
           </div>
 
-          {/* Perks */}
+          {/* Feature pills */}
           <div className="flex flex-wrap gap-2 justify-center">
             {["📸 AI Identification", "💰 Competitive Bids", "🚛 Doorstep Pickup", "🌍 Eco Impact"].map((f) => (
               <span key={f} className="px-3 py-1 text-xs bg-white/10 text-brand-200 rounded-full border border-white/15 backdrop-blur">
@@ -195,21 +195,36 @@ const SellerRegister = () => {
               </span>
             ))}
           </div>
+
+          <a href="/" className="flex items-center gap-1.5 text-sm text-brand-300 hover:text-white transition-colors">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Home
+          </a>
         </div>
       </div>
 
       {/* ── Right: form ── */}
       <div className="flex-1 overflow-y-auto py-8 px-4 sm:px-8 flex flex-col items-center">
 
-        {/* Mobile logo */}
-        <div className="flex lg:hidden items-center gap-2 mb-6 self-start">
-          <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        {/* Mobile header */}
+        <div className="flex lg:hidden items-center justify-between w-full mb-6">
+          <a href="/" className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
+            Home
+          </a>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </div>
+            <span className="text-lg font-bold text-gray-900">GreenLoop</span>
           </div>
-          <span className="text-lg font-bold text-gray-900">GreenLoop</span>
         </div>
 
         <div className="w-full max-w-lg space-y-2">
@@ -401,4 +416,4 @@ const SellerRegister = () => {
   );
 };
 
-export default SellerRegister;
+export default Register;
