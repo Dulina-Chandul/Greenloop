@@ -28,6 +28,7 @@ import NotFound404 from "./pages/common/NotFound404";
 import Unauthorized from "./pages/common/Unauthorized";
 import SellerAnalytics from "./pages/seller/SellerAnalytics";
 import CollectorAnalytics from "./pages/collector/CollectorAnalytics";
+import EcoMate from "./pages/seller/EcoMate";
 
 // import './App.css'
 
@@ -139,6 +140,16 @@ function App() {
           <ProtectedRoute allowedRoles={["seller"]}>
             <SellerLayout>
               <Settings />
+            </SellerLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/seller/eco-mate"
+        element={
+          <ProtectedRoute allowedRoles={["seller"]}>
+            <SellerLayout>
+              <EcoMate />
             </SellerLayout>
           </ProtectedRoute>
         }

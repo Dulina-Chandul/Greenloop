@@ -9,6 +9,7 @@ import {
   Settings,
   Menu,
   X,
+  Bot,
 } from "lucide-react";
 import UserMenu from "@/pages/common/UserMenu";
 
@@ -24,6 +25,7 @@ export default function SellerLayout({ children }: SellerLayoutProps) {
     { icon: LayoutGrid, label: "Overview", path: "/seller/dashboard" },
     { icon: Plus, label: "Create Listing", path: "/seller/create-listing" },
     { icon: List, label: "My Listings", path: "/seller/listings" },
+    { icon: Bot, label: "Eco-Mate", path: "/seller/eco-mate" },
     { icon: DollarSign, label: "Earnings", path: "/seller/earnings" },
     { icon: TrendingUp, label: "Analytics", path: "/seller/analytics" },
     { icon: Settings, label: "Settings", path: "/seller/settings" },

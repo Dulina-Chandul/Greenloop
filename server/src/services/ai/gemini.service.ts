@@ -31,7 +31,7 @@ export const analyzeWasteImage = async (
     Instructions:
     1. Identify the materials present in the image.
     2. Estimate the weight of each material.
-    3. Estimate the value of each material based on CURRENT market rates in ${country} in ${currency}.
+    3. Estimate the SCRAP/RECYCLABLE value of each material based on CURRENT market rates in ${country} in ${currency}. Be conservative and realistic. Do NOT use retail prices.
     
     Output Format (JSON ONLY):
 {
@@ -84,8 +84,38 @@ Respond with ONLY valid JSON, no additional text.`;
     const analysis: WasteAnalysisResult = JSON.parse(cleanedResponse);
 
     return analysis;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini Vision API error:", error);
+
+    // Fallback for quota limit (429) or other errors to allow testing
+    // Check various error properties that might contain the 429 status or message
+    const isRateLimit =
+      error?.status === 429 ||
+      error?.code === 429 ||
+      error?.response?.status === 429 ||
+      error?.message?.includes("429") ||
+      error?.message?.includes("Quota exceeded") ||
+      error?.message?.includes("RESOURCE_EXHAUSTED");
+
+    if (isRateLimit) {
+      console.warn("Quota exceeded. Returning mock data.");
+      return {
+        materials: [
+          {
+            materialType: "Plastic (Mock)",
+            confidence: 0.95,
+            estimatedWeight: 0.5,
+            estimatedValue: 25,
+          },
+        ],
+        totalWeight: 0.5,
+        totalValue: 25,
+        category: "plastic",
+        description:
+          "This is a mock description because the AI service is currently unavailable due to high demand (Quota Exceeded).",
+      };
+    }
+
     throw new Error("Failed to analyze waste image");
   }
 };
