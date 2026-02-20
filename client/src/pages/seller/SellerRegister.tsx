@@ -147,7 +147,7 @@ const Register = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
 
       {/* ── Left branding panel — half page, same as Login ── */}
-      <div className="hidden lg:flex lg:w-1/2 flex-shrink-0 bg-gradient-to-br from-green-500 via-brand-800 to-brand-700 flex-col items-center justify-center p-12 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 flex-shrink-0 bg-gradient-to-br from-emerald-600 via-green-600 to-emerald-900 flex-col items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-brand-600/30 rounded-full blur-3xl" />
         <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-brand-500/20 rounded-full blur-3xl" />
 
@@ -155,7 +155,7 @@ const Register = () => {
           {/* Logo */}
           <div className="flex items-center gap-3">
             <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center shadow-xl border border-white/20">
-              <svg className="w-8 h-8 text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
@@ -168,7 +168,7 @@ const Register = () => {
               Become a<br />
               <span className="text-brand-300">Seller</span>
             </h2>
-            <p className="text-brand-200/80 text-base leading-relaxed">
+            <p className="text-brand-200/80 text-white leading-relaxed">
               List your recyclables, receive competitive bids, and get paid — all from your doorstep.
             </p>
           </div>
@@ -182,21 +182,21 @@ const Register = () => {
             ].map((stat) => (
               <div key={stat.label} className="bg-white/10 backdrop-blur rounded-xl p-3 border border-white/10">
                 <div className="text-xl font-bold text-white">{stat.value}</div>
-                <div className="text-xs text-brand-300 mt-0.5">{stat.label}</div>
+                <div className="text-xs text-white mt-0.5">{stat.label}</div>
               </div>
             ))}
           </div>
 
           {/* Feature pills */}
           <div className="flex flex-wrap gap-2 justify-center">
-            {["📸 AI Identification", "💰 Competitive Bids", "🚛 Doorstep Pickup", "🌍 Eco Impact"].map((f) => (
-              <span key={f} className="px-3 py-1 text-xs bg-white/10 text-brand-200 rounded-full border border-white/15 backdrop-blur">
+            {["AI Identification", "Competitive Bids", "Doorstep Pickup", "Eco Impact"].map((f) => (
+              <span key={f} className="px-3 py-1 text-xs bg-white/10 text-white rounded-full border border-white/15 backdrop-blur">
                 {f}
               </span>
             ))}
           </div>
 
-          <a href="/" className="flex items-center gap-1.5 text-sm text-brand-300 hover:text-white transition-colors">
+          <a href="/" className="flex items-center gap-1.5 text-sm text-white hover:text-white transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
@@ -408,8 +408,6 @@ const Register = () => {
               </div>
             </div>
           </div>
-
-          <p className="text-center text-xs text-gray-400 py-4">Built with 💚 for a greener Sri Lanka</p>
         </div>
       </div>
     </div>
